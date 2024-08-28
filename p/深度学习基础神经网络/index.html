@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="神经网络（neural networks） 神经元 感知机模型（Perceptron） 感知机模型 感知机是由神经元复合的线性分类器。 $$ y =f(\\sum_{i=1}^n w_ix_i -\\theta) = f(w^Tx-\\theta) $$ 其中： x为样本的特征向量。 w为权重向量。 θ称为偏置（阈值） 如何这里的$f$为阶跃函数$\\epsilon(·)$，则感知机模型可以表示为激活函数： $$ (1)y =\\epsilon(w^Tx-\\theta) =\\left{ \\begin{matrix} \\ 1,w^Tx&gt;=\\theta\\ \\ 0,w^Tx&lt;\\theta \\end{matrix} \\right. $$ 由$n$维空间中的超平面方程： $$ w_1x_1+w_2x_2+w_3x_3+&hellip;+w_nx_n+b=w^Tx+b=0 $$ 可知$(1)$式将n维空间划分，可以看作一个超平面，将n维空间划分为$w^Tx&gt;=\\theta$和$w^Tx&lt;\\theta$两个空间，落在前者的输出值为1，后者的输出值为0，于是实现了分类功能。 感知机的学习策略以及参数的调整规则 所以线性模型中的思考，我们需要对权重向量$w^T$和偏置$\\theta$进行选择，这就是感知机的学习 不妨考虑一种简单的情况，现在有特征矩阵$x_1$=[2, 3]，$x_2$=[1,5]，包含标签的向量$y={1,0}$ 初始化权重向量$w$：假设$w=[1,1]$，偏置$\\theta=2$； 计算输出： 根据公式$(1)$, 有$w^Tx_1-\\theta=1·2+1·3-2=3&gt;0$, 因此被判定为1，符合真实输出； 对于$x_2$，计算得到$w^Tx_2-\\theta = 6-2=4&gt;0$，不符合输出，因此需要调整权重向量$w$和偏置$\\theta$ 提出以下优化规则： $$ w&rsquo; = w+η(y-y_{pred})x\\ \\theta&rsquo;=\\theta-η(y-y_{pred}) $$ \u200b\t假设模型的学习率$η$为1，于是$w&rsquo; = w + η(0-1)·[1,5] = [0,-4]$,$\\theta&rsquo; = 2 + 1 =3$ 对于$x_1$，再次计算$w^Tx_1-\\theta= -15 &lt; 0$，与真实输出不符； 对于$x_2$，易得$w^Tx_1-\\theta = -23 &lt; 0$，输出为0符合标签 由于输出仍不满足，因此继续根据规则调整权重和偏置验证计算。">
+<title>【深度学习基础】神经网络</title>
+
+<link rel='canonical' href='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/'>
+
+<link rel="stylesheet" href="/scss/style.min.acbdac8b9f8e0d832b2085923d703a03593634d0b84fd45c202d564a4be164b7.css"><meta property='og:title' content="【深度学习基础】神经网络">
+<meta property='og:description' content="神经网络（neural networks） 神经元 感知机模型（Perceptron） 感知机模型 感知机是由神经元复合的线性分类器。 $$ y =f(\\sum_{i=1}^n w_ix_i -\\theta) = f(w^Tx-\\theta) $$ 其中： x为样本的特征向量。 w为权重向量。 θ称为偏置（阈值） 如何这里的$f$为阶跃函数$\\epsilon(·)$，则感知机模型可以表示为激活函数： $$ (1)y =\\epsilon(w^Tx-\\theta) =\\left{ \\begin{matrix} \\ 1,w^Tx&gt;=\\theta\\ \\ 0,w^Tx&lt;\\theta \\end{matrix} \\right. $$ 由$n$维空间中的超平面方程： $$ w_1x_1+w_2x_2+w_3x_3+&hellip;+w_nx_n+b=w^Tx+b=0 $$ 可知$(1)$式将n维空间划分，可以看作一个超平面，将n维空间划分为$w^Tx&gt;=\\theta$和$w^Tx&lt;\\theta$两个空间，落在前者的输出值为1，后者的输出值为0，于是实现了分类功能。 感知机的学习策略以及参数的调整规则 所以线性模型中的思考，我们需要对权重向量$w^T$和偏置$\\theta$进行选择，这就是感知机的学习 不妨考虑一种简单的情况，现在有特征矩阵$x_1$=[2, 3]，$x_2$=[1,5]，包含标签的向量$y={1,0}$ 初始化权重向量$w$：假设$w=[1,1]$，偏置$\\theta=2$； 计算输出： 根据公式$(1)$, 有$w^Tx_1-\\theta=1·2+1·3-2=3&gt;0$, 因此被判定为1，符合真实输出； 对于$x_2$，计算得到$w^Tx_2-\\theta = 6-2=4&gt;0$，不符合输出，因此需要调整权重向量$w$和偏置$\\theta$ 提出以下优化规则： $$ w&rsquo; = w+η(y-y_{pred})x\\ \\theta&rsquo;=\\theta-η(y-y_{pred}) $$ \u200b\t假设模型的学习率$η$为1，于是$w&rsquo; = w + η(0-1)·[1,5] = [0,-4]$,$\\theta&rsquo; = 2 + 1 =3$ 对于$x_1$，再次计算$w^Tx_1-\\theta= -15 &lt; 0$，与真实输出不符； 对于$x_2$，易得$w^Tx_1-\\theta = -23 &lt; 0$，输出为0符合标签 由于输出仍不满足，因此继续根据规则调整权重和偏置验证计算。">
+<meta property='og:url' content='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/'>
+<meta property='og:site_name' content='Sion&#39;s blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='DeepLearning' /><meta property='article:published_time' content='2024-08-28T11:37:10&#43;08:00'/><meta property='article:modified_time' content='2024-08-28T11:41:36&#43;08:00'/>
+<meta name="twitter:title" content="【深度学习基础】神经网络">
+<meta name="twitter:description" content="神经网络（neural networks） 神经元 感知机模型（Perceptron） 感知机模型 感知机是由神经元复合的线性分类器。 $$ y =f(\\sum_{i=1}^n w_ix_i -\\theta) = f(w^Tx-\\theta) $$ 其中： x为样本的特征向量。 w为权重向量。 θ称为偏置（阈值） 如何这里的$f$为阶跃函数$\\epsilon(·)$，则感知机模型可以表示为激活函数： $$ (1)y =\\epsilon(w^Tx-\\theta) =\\left{ \\begin{matrix} \\ 1,w^Tx&gt;=\\theta\\ \\ 0,w^Tx&lt;\\theta \\end{matrix} \\right. $$ 由$n$维空间中的超平面方程： $$ w_1x_1+w_2x_2+w_3x_3+&hellip;+w_nx_n+b=w^Tx+b=0 $$ 可知$(1)$式将n维空间划分，可以看作一个超平面，将n维空间划分为$w^Tx&gt;=\\theta$和$w^Tx&lt;\\theta$两个空间，落在前者的输出值为1，后者的输出值为0，于是实现了分类功能。 感知机的学习策略以及参数的调整规则 所以线性模型中的思考，我们需要对权重向量$w^T$和偏置$\\theta$进行选择，这就是感知机的学习 不妨考虑一种简单的情况，现在有特征矩阵$x_1$=[2, 3]，$x_2$=[1,5]，包含标签的向量$y={1,0}$ 初始化权重向量$w$：假设$w=[1,1]$，偏置$\\theta=2$； 计算输出： 根据公式$(1)$, 有$w^Tx_1-\\theta=1·2+1·3-2=3&gt;0$, 因此被判定为1，符合真实输出； 对于$x_2$，计算得到$w^Tx_2-\\theta = 6-2=4&gt;0$，不符合输出，因此需要调整权重向量$w$和偏置$\\theta$ 提出以下优化规则： $$ w&rsquo; = w+η(y-y_{pred})x\\ \\theta&rsquo;=\\theta-η(y-y_{pred}) $$ \u200b\t假设模型的学习率$η$为1，于是$w&rsquo; = w + η(0-1)·[1,5] = [0,-4]$,$\\theta&rsquo; = 2 + 1 =3$ 对于$x_1$，再次计算$w^Tx_1-\\theta= -15 &lt; 0$，与真实输出不符； 对于$x_2$，易得$w^Tx_1-\\theta = -23 &lt; 0$，输出为0符合标签 由于输出仍不满足，因此继续根据规则调整权重和偏置验证计算。">
+    <link rel="shortcut icon" href="/static/favicon/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/berun_hu12995538977136868063.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😇</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Sion&#39;s blog</a></h1>
+            <h2 class="site-description">What&#39;s the mind? No matter.What&#39;s the matter? Never mind.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/sion258'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/sh1k1_s10n'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:3218713610@qq.com'
+                        target="_blank"
+                        title="Mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mail" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+  <path d="M3 7l9 6l9 -6" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/15265085'
+                        target="_blank"
+                        title="bilibli"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 10a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v6a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4v-6z" />
+  <path d="M8 3l2 3" />
+  <path d="M16 3l-2 3" />
+  <path d="M9 13v-2" />
+  <path d="M15 11v2" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='http://sion258.github.io/index.xml'
+                        target="_blank"
+                        title="Rss"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="5" cy="19" r="1" />
+  <path d="M4 4a16 16 0 0 1 16 16" />
+  <path d="M4 11a9 9 0 0 1 9 9" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>home | 主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about-%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About | 关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives | 归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-friends" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M7 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+  <path d="M5 22v-5l-1 -1v-4a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4l-1 1v5" />
+  <path d="M17 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+  <path d="M15 22v-4h-2l2 -6a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1l2 6h-2v4" />
+</svg>
+                
+                <span>Friends | 友链</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search | 搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links-%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links | 链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="http://localhost:1313/" selected>中文</option>
+                                
+                                    <option value="http://localhost:1313/en/" >English</option>
+                                
+                                    <option value="http://localhost:1313/ar/" >عربي</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#神经元">神经元</a></li>
+    <li><a href="#感知机模型perceptron">感知机模型（Perceptron）</a>
+      <ol>
+        <li><a href="#感知机模型">感知机模型</a></li>
+        <li><a href="#感知机的学习策略以及参数的调整规则">感知机的学习策略以及参数的调整规则</a></li>
+      </ol>
+    </li>
+    <li><a href="#多层前馈神经网络">多层前馈神经网络</a>
+      <ol>
+        <li><a href="#含隐藏层的多层功能神经元">含隐藏层的多层功能神经元</a></li>
+      </ol>
+    </li>
+    <li><a href="#误差逆传播算法bp神经网络">误差逆传播算法(BP神经网络)</a>
+      <ol>
+        <li><a href="#均方误差">均方误差</a></li>
+        <li><a href="#更新过程与梯度下降">更新过程与梯度下降</a></li>
+        <li><a href="#链式法则">链式法则</a></li>
+        <li><a href="#bp算法手动实现">BP算法手动实现</a></li>
+        <li><a href="#累积误差逆传播算法累积bp">累积误差逆传播算法（累积BP）</a></li>
+        <li><a href="#过拟合">过拟合</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" style="background-color: #2a9d8f; color: #fff;">
+                Study
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">【深度学习基础】神经网络</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 28, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="神经网络neural-networks">神经网络（neural networks）
+</h1><h2 id="神经元">神经元
+</h2><h2 id="感知机模型perceptron">感知机模型（Perceptron）
+</h2><h3 id="感知机模型">感知机模型
+</h3><p>感知机是由神经元复合的<strong>线性分类器</strong>。
+$$
+y =f(\sum_{i=1}^n w_ix_i -\theta) = f(w^Tx-\theta)
+$$
+其中：</p>
+<ul>
+<li>x为样本的特征向量。</li>
+<li>w为权重向量。</li>
+<li>θ称为偏置（阈值）</li>
+</ul>
+<p>如何这里的$f$为阶跃函数$\epsilon(·)$，则感知机模型可以表示为激活函数：
+$$
+(1)y =\epsilon(w^Tx-\theta) =\left{
+\begin{matrix}
+\ 1,w^Tx&gt;=\theta\
+\ 0,w^Tx&lt;\theta
+\end{matrix}
+\right.
+$$
+由$n$维空间中的超平面方程：
+$$
+w_1x_1+w_2x_2+w_3x_3+&hellip;+w_nx_n+b=w^Tx+b=0
+$$
+可知$(1)$式将n维空间划分，可以看作一个超平面，将n维空间划分为$w^Tx&gt;=\theta$和$w^Tx&lt;\theta$两个空间，落在前者的输出值为1，后者的输出值为0，于是实现了分类功能。</p>
+<h3 id="感知机的学习策略以及参数的调整规则">感知机的学习策略以及参数的调整规则
+</h3><p>所以<strong>线性模型</strong>中的思考，我们需要对权重向量$w^T$和偏置$\theta$进行选择，这就是<strong>感知机的学习</strong></p>
+<p>不妨考虑一种简单的情况，现在有特征矩阵$x_1$=[2, 3]，$x_2$=[1,5]，包含标签的向量$y={1,0}$</p>
+<ul>
+<li>
+<p>初始化权重向量$w$：假设$w=[1,1]$，偏置$\theta=2$；</p>
+</li>
+<li>
+<p>计算输出：</p>
+<ul>
+<li>根据公式$(1)$, 有$w^Tx_1-\theta=1·2+1·3-2=3&gt;0$, 因此被判定为1，符合真实输出；</li>
+<li>对于$x_2$，计算得到$w^Tx_2-\theta = 6-2=4&gt;0$，不符合输出，因此需要调整权重向量$w$和偏置$\theta$</li>
+</ul>
+</li>
+<li>
+<p>提出以下优化规则：
+$$
+w&rsquo; = w+η(y-y_{pred})x\
+\theta&rsquo;=\theta-η(y-y_{pred})
+$$
+​	假设模型的学习率$η$为1，于是$w&rsquo; = w + η(0-1)·[1,5] = [0,-4]$,$\theta&rsquo; = 2 + 1 =3$</p>
+<ul>
+<li>对于$x_1$，再次计算$w^Tx_1-\theta= -15 &lt; 0$，与真实输出不符；</li>
+<li>对于$x_2$，易得$w^Tx_1-\theta = -23 &lt; 0$，输出为0符合标签</li>
+</ul>
+<p>由于输出仍不满足，因此继续根据规则调整权重和偏置验证计算。</p>
+<h2 id="多层前馈神经网络">多层前馈神经网络
+</h2><p>在前面我们提到，感知机是一种线性分类器，利用感知机模型构成的单层神经元只有输出层神经原进行激活函数处理，只能解决<strong>线性可分的问题</strong>。</p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%b8%89%29--NN%5cNN.assets%5cimage-20240726164829724.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240726164829724"
+	
+	
+></p>
+<p>其中“与”“或”“非”都是线性可分的，即存在一个线性超平面能将他们分开，在感知机的学习过程中调整权重矩阵和偏置最终使得学习过程收敛（converge），而对于非线性可分的问题，例如图上的&quot;异或&quot;问题，可以看到不存在有且仅有一个线性超平面将他们分开，这使得学习过程发生振荡（fluctuation），无法确定解。</p>
+<h3 id="含隐藏层的多层功能神经元">含隐藏层的多层功能神经元
+</h3><p>为了解决非线性可分问题，我们引入多层功能神经元的概念，这里两层感知机模型就能解决上“异或”问题.</p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%b8%89%29--NN%5cNN.assets%5cimage-20240726165420935.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240726165420935"
+	
+	
+></p>
+<p>更一般的多层功能神经元构成的神经网络如图所示：</p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%b8%89%29--NN%5cNN.assets%5cimage-20240726165606198.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240726165606198"
+	
+	
+></p>
+</li>
+</ul>
+<p><strong>每层神经元与下一层神经元全互连，同层神经元不进行连接，也不跨层连接，上一层神经元的输出作为下一层神经元的输入</strong>，我们定义这样的神经网络为&quot;<strong>多层前馈神经网络</strong>&quot;（multi-layer feedback neural networks）.神经元之间用**“连接权”和阈值**进行连接。</p>
+<p>单隐层前馈网络是指只有一个隐藏层，双隐层前馈网络有两层隐藏层，需要注意的是，输入层神经元没有激活函数进行处理，仅仅作为输入。</p>
+<h2 id="误差逆传播算法bp神经网络">误差逆传播算法(BP神经网络)
+</h2><p>由于构造了复杂的学习模型多层前馈神经网络，我们的单层感知机模型的学习方法$\Delta w = η(y-y_{pred})x$</p>
+<p>$\Delta\theta = -η(y-y_{pred})$已经无法正常运行。因此我们需要更适用的算法。</p>
+<p>**误差逆传播算法(error BackPropagation，BP)**是一种适用于多层前馈神经网络的学习算法（BP算法不止适用于多层前馈神经网络）。</p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%b8%89%29--NN%5cNN.assets%5cimage-20240726171227862.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240726171227862"
+	
+	
+></p>
+<p>我们来解释一下BP算法的具体过程。</p>
+<ol>
+<li>
+<p><strong>训练集定义：</strong></p>
+<ul>
+<li>设定训练集 $(D = {(x_1, y_1), (x_2, y_2), &hellip;, (x_m, y_m)})$，其中$ (x_i \in \mathbb{R}^d)，(y_i \in \mathbb{R}^l)$，即每个示例由 $d$个属性输入，输出 $l$ 维实值向量。</li>
+</ul>
+</li>
+<li>
+<p><strong>BP网络结构：</strong></p>
+<ul>
+<li>图 5.7 展示了一个具有输入层、隐藏层和输出层的三层前馈神经网络：
+<ul>
+<li><strong>输入层：</strong> 包含$ (d)$ 个输入神经元。</li>
+<li><strong>隐藏层：</strong> 包含 $(q) $个神经元。</li>
+<li><strong>输出层：</strong> 包含 $(l)$ 个神经元。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>数学符号和公式：</strong></p>
+<ul>
+<li><strong>隐层神经元的输入：</strong>
+<ul>
+<li>第 $h$ 个隐层神经元接收到的输入为：$(a_h = \sum_{i=1}^{d} v_{ih} x_i)$，其中 $w_{ih}$ 表示从输入层第 $i$ 个神经元到隐层第 $h$ 个神经元的连接权值。</li>
+</ul>
+</li>
+<li><strong>输出层神经元的输入：</strong>
+<ul>
+<li>第 $j$ 个输出层神经元接收到的输入为：$(β_j = \sum_{h=1}^{q} w_{hj} b_h)$，其中 ($b_h$) 是隐层第 ($h$) 个神经元的输出，($w_{hj}$) 是从隐层第 ($h$) 个神经元到输出层第 ($j$) 个神经元的连接权值。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>激活函数：</strong></p>
+<ul>
+<li>假设隐层和输出层神经元都使用 $Sigmoid $函数作为激活函数。</li>
+</ul>
+</li>
+<li>
+<p><strong>输出层的计算：</strong></p>
+<ul>
+<li>对于训练例 $((x_k, y_k))$，假设神经网络的输出为 $$(y_{k1}^<em>, y_{k2}^</em>, &hellip;, y_{kl}^<em>)$$(表示第k个输入的第j个神经元输出)，即 $$(y_{kj}^</em> = f(β_j - θ_j))$$，其中 ($f$) 为激活函数，($θ_j$) 为第 ($j$) 个输出神经元的阈值。</li>
+</ul>
+<p>网络中有 <strong>$(d+l+1)q+l$<strong>个参数需确定</strong>:输入层到隐层的$d\times q$个权值，隐层到输出层的$q\times l$个权 层神 的权值、 $q$ 个隐层神经元的偏置，$l$个输出层神经元的阈值。</strong></p>
+<p>直到上面为止还是能沿用单层感知机的理解，接下来我们也同单层模型一样，考虑学习方法以确定权重矩阵和偏置。</p>
+<h3 id="均方误差">均方误差
+</h3><p>为了找到一组好的参数值$(w,\theta)$，我们需要一个评估指标描述什么是&quot;好的&quot;。此时我们想起线性回归模型的处理方法，这里我们适用均方误差来进行。</p>
+<p>对于训练例 $(x_k, y_k)$，定义网络在 $(x_k, y_k)$ 上的均方误差为：
+$$
+E_k = \frac{1}{2} \sum_{j=1}^{l} (y_{kj}^* - y_{kj})^2
+$$</p>
+<h3 id="更新过程与梯度下降">更新过程与梯度下降
+</h3><p>$v$为任意参数，$v$的更新过程表示为更新估计式：
+$$
+v \leftarrow v+\Delta v \ .
+$$
+以隐层到输出层的连接权$w_{hj}$为例，使用<strong>梯度下降</strong>(gradient descent)策略，梯度下降在线性回归模型中也关键方法。给定学习率$η$，有：
+$$
+\Delta w_{hj} = -η\frac{∂E_k}{∂w_{hj}}
+$$</p>
+<h3 id="链式法则">链式法则
+</h3><p>我们可以注意到$E_k$是$w_{hj}$的复合函数，这里使用复合函数求导的链式法则，有：
+$$
+(1)\frac{∂E_k}{∂w_{hj}}=\frac{∂E_k}{∂y^<em>_{kj}}·\frac{∂y^</em><em>{kj}}{∂\beta_j}·\frac{∂\beta_j}{∂w</em>{hj}}\ .
+$$
+由于$(β_j = \sum_{h=1}^{q} w_{hj} b_h)$，所以：
+$$
+(2)\frac{∂\beta_j}{∂w_{hj}} = b_h\ .
+$$
+定义$g_j$:
+$$
+(3)g_j =-\frac{∂E_k}{∂y^<em>_{kj}}·\frac{∂y^</em><em>{kj}}{∂\beta_j}\
+=-(y^*</em>{kj}-y_{kj})f&rsquo;(\beta_j-\theta_j)\
+=y^<em>_{kj}(1-y^</em><em>{kj})(y</em>{kj}-y^*<em>{kj})
+$$
+最终可以得到
+$$
+\Delta w</em>{hj} =ηg_jb_h\ .
+$$
+类似可得其他参数：
+$$
+\Delta \theta_j = - \eta g_j，
+$$</p>
+<p>$$
+\Delta w_{ih} = \eta e_h x_i，
+$$</p>
+<p>$$
+\Delta \gamma_h = - \eta e_h， \quad
+$$</p>
+<p>$$
+e_h = - \frac{\partial E_k}{\partial b_h} \cdot \frac{\partial b_h}{\partial \alpha_h}
+$$</p>
+<p>$$
+= - \sum_{j=1}^{l} \frac{\partial E_k}{\partial \beta_j} \cdot \frac{\partial \beta_j}{\partial b_h} f&rsquo;(\alpha_h - \gamma_h)
+$$</p>
+<p>$$
+= \sum_{j=1}^{l} w_{hj} g_j f&rsquo;(\alpha_h - \gamma_h)
+$$</p>
+<p>$$
+= b_h (1 - b_h) \sum_{j=1}^{l} w_{hj} g_j。 \quad (5.15)
+$$</p>
+</li>
+</ol>
+<h3 id="bp算法手动实现">BP算法手动实现
+</h3><p>对每个训练样例，BP算法执行以下操作：</p>
+<p><strong>（1）先将输入示例提供给输入层神经元，然后逐层将信号前传，直到产生输出层的结果；</strong></p>
+<p><strong>（2）然后计算输出层的误差（第4-5行）</strong></p>
+<p><strong>（3）再将误差逆向传播至隐层神经元（第6行）</strong></p>
+<p><strong>（4）最后根据各层神经元的误差来对连接权和阈值进行调整（第7行）。</strong></p>
+<p>该迭代过程循环进行，直到达到某些停止条件为止，例如训练误差达到一个很小的值。图给出了在2个属性、5个样本的西瓜数据上，随着训练样例的增加，网络参数和分类边界的变化情况。</p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%b8%89%29--NN%5cNN.assets%5cimage-20240726180539860.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240726180539860"
+	
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">输入：训练集 $D = \{(x_k, y_k)\}_{k=1}^m$
+</span></span><span class="line"><span class="cl">      学习率 $\eta$
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">过程：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">1. 在 $[-1, 0, 1]$ 范围内随机初始化网络中所有连接权和阈值
+</span></span><span class="line"><span class="cl">2. repeat
+</span></span><span class="line"><span class="cl">3. for all $(x_k, y_k) \in D$ do
+</span></span><span class="line"><span class="cl">4. 根据式(5.3)计算当前样本的输出 $y_{kj}^*$
+</span></span><span class="line"><span class="cl">5. 根据式(5.10)计算输出层神经元的梯度 $g_j$
+</span></span><span class="line"><span class="cl">6. 根据式(5.11)计算隐层神经元的梯度 $e_h$
+</span></span><span class="line"><span class="cl">7. 根据式(5.12)-(5.14)更新连接权 $w_{hj}, v_{ih}$ 和阈值 $\theta_j, \gamma_h$
+</span></span><span class="line"><span class="cl">8. until 达到停止条件
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">输出：连接权与阈值确定的多层前馈神经网络
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>附上手写的源码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">nn</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">weight_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">input_size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">weight_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">output_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">thre_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">thre_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">output_size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">eta</span> <span class="o">=</span> <span class="n">eta</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_get_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weight</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_sigmoid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">thre</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span> <span class="o">-</span> <span class="n">thre</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="nb">input</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">thre</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigmoid</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">thre</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_get_MSE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">pre_output</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">pre_output</span> <span class="o">-</span> <span class="n">output</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_get_new_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">delta_weight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">delta_weight</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_get_new_thre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grad</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_get_output_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">error_output</span> <span class="o">=</span> <span class="n">output</span> <span class="o">-</span> <span class="n">y</span>
+</span></span><span class="line"><span class="cl">        <span class="n">grad_output</span> <span class="o">=</span> <span class="n">error_output</span> <span class="o">*</span> <span class="n">output</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">grad_output</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">_get_hide_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">error_hidden</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">weight</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">grad_hidden</span> <span class="o">=</span> <span class="n">error_hidden</span> <span class="o">*</span> <span class="n">output</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">grad_hidden</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># 前向传播</span>
+</span></span><span class="line"><span class="cl">            <span class="n">input_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_1</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">output_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output</span><span class="p">(</span><span class="n">input_1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thre_1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="n">input_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_2</span><span class="p">,</span> <span class="n">output_1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">output_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output</span><span class="p">(</span><span class="n">input_2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thre_2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="c1"># 计算损失</span>
+</span></span><span class="line"><span class="cl">            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_MSE</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">output_2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="c1"># 反向传播</span>
+</span></span><span class="line"><span class="cl">            <span class="n">grad_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output_grad</span><span class="p">(</span><span class="n">output_2</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">grad_hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_hide_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_2</span><span class="p">,</span> <span class="n">output_1</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="c1"># 更新权重和偏置</span>
+</span></span><span class="line"><span class="cl">            <span class="n">delta_weight_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_new_weight</span><span class="p">(</span><span class="n">grad_output</span><span class="p">,</span> <span class="n">output_1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">weight_2</span> <span class="o">-=</span> <span class="n">delta_weight_2</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">thre_2</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_new_thre</span><span class="p">(</span><span class="n">grad_output</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="n">delta_weight_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_new_weight</span><span class="p">(</span><span class="n">grad_hidden</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">weight_1</span> <span class="o">-=</span> <span class="n">delta_weight_1</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">thre_1</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_new_thre</span><span class="p">(</span><span class="n">grad_hidden</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">, Loss: </span><span class="si">{</span><span class="n">loss</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">input_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_1</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">output_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output</span><span class="p">(</span><span class="n">input_1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thre_1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">input_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weight_2</span><span class="p">,</span> <span class="n">output_1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">output_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output</span><span class="p">(</span><span class="n">input_2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thre_2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">output_2</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl"><span class="n">input_size</span> <span class="o">=</span> <span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">hidden_size</span> <span class="o">=</span> <span class="mi">5</span>
+</span></span><span class="line"><span class="cl"><span class="n">output_size</span> <span class="o">=</span> <span class="mi">3</span>
+</span></span><span class="line"><span class="cl"><span class="n">eta</span> <span class="o">=</span> <span class="mf">0.7</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Prediction: </span><span class="si">{</span><span class="n">prediction</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 0, Loss: 0.08452484439144649
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 100, Loss: 0.00043097425030784627
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 200, Loss: 6.173784504106113e-05
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 300, Loss: 6.111382932194645e-06
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 400, Loss: 5.274844786786648e-07
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 500, Loss: 4.445371701622411e-08
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 600, Loss: 3.7266722662723944e-09
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 700, Loss: 3.1195917455011153e-10
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 800, Loss: 2.6102862257159366e-11
+</span></span></span><span class="line"><span class="cl"><span class="s1">Epoch 900, Loss: 2.1838569148871845e-12
+</span></span></span><span class="line"><span class="cl"><span class="s1">Prediction: [0.1000008  0.19999945 0.3000004 ]
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="累积误差逆传播算法累积bp">累积误差逆传播算法（累积BP）
+</h3><p>前面介绍的BP算法针对单个均方误差$E_k$，这意味着每次参数更新都只针对一个样例数据，导致更新频繁以及可能出现的不同样例导致的参数调整抵消等问题。所以为了使数据集整体达到同样的误差极小点，累积BP直接针对累积误差最小化:$E = \frac{1}{m} \sum_{k=1}^{m}E_k$，读取数据集一遍之后再进行更新，然而累积BP在累积误差下降到一定程度时，可能出现下降缓慢的情况，这时标准BP会得到更好的解。</p>
+<p><strong>类似随机梯度下降和标准梯度下降的区别。</strong></p>
+<h3 id="过拟合">过拟合
+</h3><ul>
+<li>早停：将数据集分成训练集和验证集，训练集用来计算梯度，更新连接权和偏置，验证集用来估计误差，如果训练集误差降低但是验证机误差升高，则停止训练（类似决策树的后剪枝）</li>
+<li>正则化：在误差目标函数增加一个描述网络复杂度的部分，例如<strong>连接权和偏置的平方和</strong>：</li>
+</ul>
+<p>$$
+E=\lambda \frac{1}{m}\sum_{k=1}^m E_k + (1-\lambda)\sum_i w_i^*\ ,
+$$</p>
+<p>其中$\lambda \in (0,1)$用于经验误差与网络复杂度这两项进行折中。常使用<strong>交叉验证法</strong>来估计。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/deeplearning/">DeepLearning</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最后更新于 Aug 28, 2024 11:41 CST
+        </span>
+    </section></footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">【深度学习基础】决策树模型</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80svm/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">【深度学习基础】SVM</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"]});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 Exshine|SION
+    </section>
+    
+    <section class="powerby">
+        
+            el psy congroo <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

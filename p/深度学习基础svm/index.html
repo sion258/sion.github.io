@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="支持向量机（SVM） [TOC] 在感知机模型中，我们通过找到一个超平面$w^Tx - \\theta = 0$来将样本空间划分来完成分类任务，在感知机模型中，主要通过设置$w^T和\\theta$的更新公式完成超平面的确定。现在我们考虑最合适的超平面的确认方式&ndash;超平面离样本尽可能远离并且正好处于“正中间”。这就是SVM想要求解的情形。 间隔 在样本空间中，定义任意点$x$到超平面$(w,b)$的距离可写为： $$ r=\\frac{|w^Tx + b|}{||w||} $$ 将训练样本分类好的超平面应当满足： （1）离样本足够远 （2）正好处于最中间 根据超平面性质，y为1被划分到正空间，y为-1被划分到负空间： $$ \\left{ \\begin{matrix} w^Tx+b&gt;=0,y=+1\\ w^Tx+b&lt;0,y=-1\\ \\end{matrix} \\right. $$ 接下来满足（2）： $$ \\left{ \\begin{matrix} \\frac{|w^Tx_i+b|}{||w||}&gt;\\frac{|w^Tx_^{+}+b|}{||w||}\\ \\frac{|w^Tx_i+b|}{||w||}&gt;\\frac{|w^Tx_^{-}+b|}{||w||}\\ \\end{matrix} \\right. $$ 由两式得 $$ \\left{ \\begin{matrix} w^Tx+b&gt;=1,y=+1\\ w^Tx+b&lt;=-1,y=-1\\ \\end{matrix} \\right. $$ 当且仅当$x_i$为离超平面最近的点时。等号成立，这些样本点都是一个特征向量，这样的向量被称为“支持向量”。两个不同类的支持向量到超平面的距离之和为： $$ \\gamma = \\frac{2}{||w||} $$ 被称为间隔（margin），满足（1）意味着间隔最大 到这里我们明确了，想要找到满足条件的超平面，要找到满足$\\left{ \\begin{matrix} w^Tx+b&gt;=1,y=+1\\ w^Tx+b&lt;=-1,y=-1\\ \\end{matrix} \\right.$的超平面的参数$w$和$b$使得$\\gamma$最大： $$ max_{w,b}\\frac{2}{||w||} \\ \\qquad s.t.\\quad y_i(w^Tx_i+b)&gt;=1,\\quad i=1,2&hellip;,m. $$ 要求解$\\frac{2}{||w||}$最大的情形，等价于求$||w||^2$最小的情形，因此上述问题等价于式（2）： $$ min_{w,b}\\frac{||w||^2}{2} \\ \\qquad s.">
+<title>【深度学习基础】SVM</title>
+
+<link rel='canonical' href='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80svm/'>
+
+<link rel="stylesheet" href="/scss/style.min.acbdac8b9f8e0d832b2085923d703a03593634d0b84fd45c202d564a4be164b7.css"><meta property='og:title' content="【深度学习基础】SVM">
+<meta property='og:description' content="支持向量机（SVM） [TOC] 在感知机模型中，我们通过找到一个超平面$w^Tx - \\theta = 0$来将样本空间划分来完成分类任务，在感知机模型中，主要通过设置$w^T和\\theta$的更新公式完成超平面的确定。现在我们考虑最合适的超平面的确认方式&ndash;超平面离样本尽可能远离并且正好处于“正中间”。这就是SVM想要求解的情形。 间隔 在样本空间中，定义任意点$x$到超平面$(w,b)$的距离可写为： $$ r=\\frac{|w^Tx + b|}{||w||} $$ 将训练样本分类好的超平面应当满足： （1）离样本足够远 （2）正好处于最中间 根据超平面性质，y为1被划分到正空间，y为-1被划分到负空间： $$ \\left{ \\begin{matrix} w^Tx+b&gt;=0,y=+1\\ w^Tx+b&lt;0,y=-1\\ \\end{matrix} \\right. $$ 接下来满足（2）： $$ \\left{ \\begin{matrix} \\frac{|w^Tx_i+b|}{||w||}&gt;\\frac{|w^Tx_^{+}+b|}{||w||}\\ \\frac{|w^Tx_i+b|}{||w||}&gt;\\frac{|w^Tx_^{-}+b|}{||w||}\\ \\end{matrix} \\right. $$ 由两式得 $$ \\left{ \\begin{matrix} w^Tx+b&gt;=1,y=+1\\ w^Tx+b&lt;=-1,y=-1\\ \\end{matrix} \\right. $$ 当且仅当$x_i$为离超平面最近的点时。等号成立，这些样本点都是一个特征向量，这样的向量被称为“支持向量”。两个不同类的支持向量到超平面的距离之和为： $$ \\gamma = \\frac{2}{||w||} $$ 被称为间隔（margin），满足（1）意味着间隔最大 到这里我们明确了，想要找到满足条件的超平面，要找到满足$\\left{ \\begin{matrix} w^Tx+b&gt;=1,y=+1\\ w^Tx+b&lt;=-1,y=-1\\ \\end{matrix} \\right.$的超平面的参数$w$和$b$使得$\\gamma$最大： $$ max_{w,b}\\frac{2}{||w||} \\ \\qquad s.t.\\quad y_i(w^Tx_i+b)&gt;=1,\\quad i=1,2&hellip;,m. $$ 要求解$\\frac{2}{||w||}$最大的情形，等价于求$||w||^2$最小的情形，因此上述问题等价于式（2）： $$ min_{w,b}\\frac{||w||^2}{2} \\ \\qquad s.">
+<meta property='og:url' content='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80svm/'>
+<meta property='og:site_name' content='Sion&#39;s blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='DeepLearning' /><meta property='article:published_time' content='2024-08-27T11:35:03&#43;08:00'/><meta property='article:modified_time' content='2024-08-28T11:55:53&#43;08:00'/>
+<meta name="twitter:title" content="【深度学习基础】SVM">
+<meta name="twitter:description" content="支持向量机（SVM） [TOC] 在感知机模型中，我们通过找到一个超平面$w^Tx - \\theta = 0$来将样本空间划分来完成分类任务，在感知机模型中，主要通过设置$w^T和\\theta$的更新公式完成超平面的确定。现在我们考虑最合适的超平面的确认方式&ndash;超平面离样本尽可能远离并且正好处于“正中间”。这就是SVM想要求解的情形。 间隔 在样本空间中，定义任意点$x$到超平面$(w,b)$的距离可写为： $$ r=\\frac{|w^Tx + b|}{||w||} $$ 将训练样本分类好的超平面应当满足： （1）离样本足够远 （2）正好处于最中间 根据超平面性质，y为1被划分到正空间，y为-1被划分到负空间： $$ \\left{ \\begin{matrix} w^Tx+b&gt;=0,y=+1\\ w^Tx+b&lt;0,y=-1\\ \\end{matrix} \\right. $$ 接下来满足（2）： $$ \\left{ \\begin{matrix} \\frac{|w^Tx_i+b|}{||w||}&gt;\\frac{|w^Tx_^{+}+b|}{||w||}\\ \\frac{|w^Tx_i+b|}{||w||}&gt;\\frac{|w^Tx_^{-}+b|}{||w||}\\ \\end{matrix} \\right. $$ 由两式得 $$ \\left{ \\begin{matrix} w^Tx+b&gt;=1,y=+1\\ w^Tx+b&lt;=-1,y=-1\\ \\end{matrix} \\right. $$ 当且仅当$x_i$为离超平面最近的点时。等号成立，这些样本点都是一个特征向量，这样的向量被称为“支持向量”。两个不同类的支持向量到超平面的距离之和为： $$ \\gamma = \\frac{2}{||w||} $$ 被称为间隔（margin），满足（1）意味着间隔最大 到这里我们明确了，想要找到满足条件的超平面，要找到满足$\\left{ \\begin{matrix} w^Tx+b&gt;=1,y=+1\\ w^Tx+b&lt;=-1,y=-1\\ \\end{matrix} \\right.$的超平面的参数$w$和$b$使得$\\gamma$最大： $$ max_{w,b}\\frac{2}{||w||} \\ \\qquad s.t.\\quad y_i(w^Tx_i+b)&gt;=1,\\quad i=1,2&hellip;,m. $$ 要求解$\\frac{2}{||w||}$最大的情形，等价于求$||w||^2$最小的情形，因此上述问题等价于式（2）： $$ min_{w,b}\\frac{||w||^2}{2} \\ \\qquad s.">
+    <link rel="shortcut icon" href="/static/favicon/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/berun_hu12995538977136868063.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😇</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Sion&#39;s blog</a></h1>
+            <h2 class="site-description">What&#39;s the mind? No matter.What&#39;s the matter? Never mind.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/sion258'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/sh1k1_s10n'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:3218713610@qq.com'
+                        target="_blank"
+                        title="Mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mail" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+  <path d="M3 7l9 6l9 -6" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/15265085'
+                        target="_blank"
+                        title="bilibli"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 10a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v6a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4v-6z" />
+  <path d="M8 3l2 3" />
+  <path d="M16 3l-2 3" />
+  <path d="M9 13v-2" />
+  <path d="M15 11v2" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='http://sion258.github.io/index.xml'
+                        target="_blank"
+                        title="Rss"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="5" cy="19" r="1" />
+  <path d="M4 4a16 16 0 0 1 16 16" />
+  <path d="M4 11a9 9 0 0 1 9 9" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>home | 主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about-%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About | 关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives | 归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-friends" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M7 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+  <path d="M5 22v-5l-1 -1v-4a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4l-1 1v5" />
+  <path d="M17 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+  <path d="M15 22v-4h-2l2 -6a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1l2 6h-2v4" />
+</svg>
+                
+                <span>Friends | 友链</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search | 搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links-%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links | 链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="http://localhost:1313/" selected>中文</option>
+                                
+                                    <option value="http://localhost:1313/en/" >English</option>
+                                
+                                    <option value="http://localhost:1313/ar/" >عربي</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#间隔">间隔</a></li>
+    <li><a href="#对偶问题">对偶问题</a></li>
+    <li><a href="#核函数">核函数</a>
+      <ol>
+        <li><a href="#核函数的定义">核函数的定义</a></li>
+        <li><a href="#常见核函数">常见核函数</a></li>
+      </ol>
+    </li>
+    <li><a href="#软间隔与正则化">软间隔与正则化</a>
+      <ol>
+        <li><a href="#正则化">正则化</a></li>
+        <li><a href="#软间隔svm求解">软间隔SVM求解</a></li>
+        <li><a href="#软间隔支持向量机的kkt条件">软间隔支持向量机的KKT条件</a></li>
+      </ol>
+    </li>
+    <li><a href="#阅读材料">阅读材料</a>
+      <ol>
+        <li><a href="#拉格朗日对偶问题">拉格朗日对偶问题</a></li>
+        <li><a href="#投影定理">投影定理</a>
+          <ol>
+            <li><a href="#hilbert空间">Hilbert空间</a></li>
+            <li><a href="#数学证明">数学证明</a></li>
+          </ol>
+        </li>
+        <li><a href="#关于核函数的性质">关于核函数的性质</a>
+          <ol>
+            <li><a href="#半正定矩阵">半正定矩阵</a></li>
+            <li><a href="#再生核希尔伯特空间rkhs">再生核希尔伯特空间（RKHS）</a></li>
+            <li><a href="#核函数与-rkhs-之间的关系">核函数与 RKHS 之间的关系</a></li>
+            <li><a href="#从半正定矩阵到特征映射">从半正定矩阵到特征映射</a></li>
+          </ol>
+        </li>
+        <li><a href="#正则化-1">正则化</a>
+          <ol>
+            <li><a href="#含有替代损失函数的svm目标函数">含有替代损失函数的SVM目标函数</a></li>
+            <li><a href="#结构风险和经验风险">结构风险和经验风险</a></li>
+            <li><a href="#正则化-2">正则化</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+
+  <ol>
+    <li><a href="#支持向量回归模型的解">支持向量回归模型的解</a></li>
+    <li><a href="#核方法与核线性扩展">核方法与核线性扩展</a></li>
+    <li><a href="#阅读材料核方法和klda">阅读材料(核方法和KLDA)</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" style="background-color: #2a9d8f; color: #fff;">
+                Study
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80svm/">【深度学习基础】SVM</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 27, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="支持向量机svm">支持向量机（SVM）
+</h1><p>[TOC]</p>
+<p>在感知机模型中，我们通过找到一个超平面$w^Tx - \theta = 0$来将样本空间划分来完成分类任务，在感知机模型中，主要通过设置$w^T和\theta$的更新公式完成超平面的确定。现在我们考虑最合适的超平面的确认方式&ndash;<strong>超平面离样本尽可能远离并且正好处于“正中间”</strong>。这就是SVM想要求解的情形。</p>
+<h2 id="间隔">间隔
+</h2><p>在样本空间中，定义任意点$x$到超平面$(w,b)$的距离可写为：
+$$
+r=\frac{|w^Tx + b|}{||w||}
+$$
+将训练样本分类好的超平面应当满足：</p>
+<p>（1）离样本足够远</p>
+<p>（2）正好处于最中间</p>
+<p>根据超平面性质，y为1被划分到正空间，y为-1被划分到负空间：
+$$
+\left{
+\begin{matrix}
+w^Tx+b&gt;=0,y=+1\
+w^Tx+b&lt;0,y=-1\
+\end{matrix}
+\right.
+$$
+接下来满足（2）：
+$$
+\left{
+\begin{matrix}<br>
+\frac{|w^Tx_i+b|}{||w||}&gt;\frac{|w^Tx_<em>^{+}+b|}{||w||}\
+\frac{|w^Tx_i+b|}{||w||}&gt;\frac{|w^Tx_</em>^{-}+b|}{||w||}\
+\end{matrix}
+\right.
+$$
+由两式得
+$$
+\left{
+\begin{matrix}
+w^Tx+b&gt;=1,y=+1\
+w^Tx+b&lt;=-1,y=-1\
+\end{matrix}
+\right.
+$$
+<img src="C:%5cUsers%5c%e5%94%90%e6%b5%a9%e9%92%8f%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20240727160223370.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240727160223370"
+	
+	
+></p>
+<p><strong>当且仅当$x_i$为离超平面最近的点时。等号成立，这些样本点都是一个特征向量，这样的向量被称为“支持向量”</strong>。两个不同类的支持向量到超平面的距离之和为：
+$$
+\gamma = \frac{2}{||w||}
+$$
+被称为<strong>间隔（margin）</strong>，<strong>满足（1）意味着间隔最大</strong></p>
+<p>到这里我们明确了，想要找到满足条件的超平面，要找到满足$\left{
+\begin{matrix}
+w^Tx+b&gt;=1,y=+1\
+w^Tx+b&lt;=-1,y=-1\
+\end{matrix}
+\right.$的超平面的参数$w$和$b$使得$\gamma$最大：
+$$
+max_{w,b}\frac{2}{||w||}
+\ \qquad s.t.\quad y_i(w^Tx_i+b)&gt;=1,\quad i=1,2&hellip;,m.
+$$
+要求解$\frac{2}{||w||}$最大的情形，等价于求$||w||^2$最小的情形，因此上述问题等价于式（2）：
+$$
+min_{w,b}\frac{||w||^2}{2}
+\ \qquad s.t.\quad y_i(w^Tx_i+b)&gt;=1,\quad i=1,2&hellip;,m.
+$$</p>
+<blockquote>
+<p><strong>ps:这里转化为$||w||^2$而不是$||w||$的原因在于，求$||w||^2$是一个凸优化问题，更容易使用优化算法求解。</strong></p>
+<p>$s.t.\quad y_i(w^Tx_i+b)&gt;=1,\quad i=1,2&hellip;,m.$是由$\left{
+\begin{matrix}
+w^Tx+b&gt;=1,y=+1\
+w^Tx+b&lt;=-1,y=-1\
+\end{matrix}
+\right.$得到的</p>
+</blockquote>
+<h2 id="对偶问题">对偶问题
+</h2><p>对于式（2），我们这里<strong>采用拉格朗日乘子法求得“对偶问题”</strong>，对于约束添加拉格朗日乘子$\alpha_i&gt;=0$,有式（3）：
+$$
+L(w,b,\alpha) = \frac{1}{2}||w||^2+\sum_{i=1}^m \alpha_i(1-y_i(w^Tx_i+b))
+$$
+分别对$w$,$b$求偏导：
+$$
+w=\sum_{i=1}^m\alpha_iy_ix_i\
+0=\sum_{i=1}^m\alpha_iy_i\ .
+$$
+带入原式得式（2）的对偶问题式（4）：
+$$
+max_\alpha\sum_{i=1}^m-\frac{1}{2}\sum_{i=1}^m\sum_{j=1}^m\alpha_i\alpha_jy_iy_jx_i^Tx_j\
+\ \qquad s.t.\quad \sum_{i=1}^m\alpha_iy_i=0,\
+\alpha_i&gt;=0,\quad i=1,2&hellip;,m.
+$$</p>
+<blockquote>
+<p>为什么求其对偶问题：</p>
+<p>（1） 式 （2） 中的未知数是$ w $和$ b$，式 (4) 中的未知数是 $α$，$w$ 的维度 $d$ 对应样本特征个数，$α$ 的 维度 $m$ 对应训练样本个数，通常 $m ≪ d$，所以求解式(4) 更高效，反之求解式 (2) 更高效</p>
+<p>（2）式(4)中有样本内积$x_i^Tx_j$这一项，后续可以很自然地引入<strong>核函数</strong>，进而使得支持向量机也能对在原始特征空间线性不可分的数据进行分类(pumpkin book)）</p>
+</blockquote>
+<p>解出$\alpha$后，得到$w$与$b$，于是可以得到模型(*)：
+$$
+f(x) = w^Tx+b\
+=\sum_{i=1}^m\alpha_iy_ix_i^Tx+b
+$$</p>
+<h2 id="核函数">核函数
+</h2><p>与单层感知层模型一样，上面的讨论我们假设了样本空间是线性可分的，因此可以由一个线性超平面来划分样本空间：
+$$
+f(x) =w^Tx+b
+$$
+所以当面对“异或”这样的非线性可分任务时就无法运作，一个好的办法是<strong>将原本样本空间的特征映射到一个更高维的空间</strong>里去：</p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%ba%8c%29--SVM%5cSVM.assets%5cimage-20240727213848901.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240727213848901"
+	
+	
+></p>
+<p><strong>根据投影定理，任何有限维空间都可以嵌入到更高维的空间中</strong>。这个更高维的空间包含了原始空间的所有特征，同时还可以容纳更多的特征，从而使得数据分析和处理变得更加灵活和准确。</p>
+<p>令$\phi(x)$表示将$x$映射后的特征向量，那么划分样本空间的超平面表示为：
+$$
+f(x)=w^T\phi(x)+b
+$$
+类似的，求解$w^T$满足凸优化问题：
+$$
+min_{w,b}\frac{1}{2}||w||^2\
+s.t.\quad y_i(w^T\phi(x_i)+b)&gt;=1,\quad i=1,2,3,&hellip;,m.
+$$
+类似地，也有对偶问题(<em>):
+$$
+max_\alpha\sum_{i=1^m}\alpha_i-\frac{1}{2}\sum_{i=1}^m\sum_{j=1}^m\alpha_i\alpha_jy_iy_j\phi(x_i)^T\phi(x_i)\
+s.t. \quad \sum_{i=1}^m\alpha_iy_i = 0,\quad \alpha_i&gt;=0,\quad i= 1,2,..,m.
+$$
+在(</em>)中，显式地处理$\phi(x_i)^T\phi(x_i)$显得十分麻烦，因为升维之后的空间可能维度很高，甚至无限维(维数灾难)，所以我们考虑有函数$k(x_i,x_j)$，在升维之后在样本空间的内积能改写为在原始样本空间的$k(x_i,x_j)$：
+$$
+max_\alpha\sum_{i=1}^m\alpha_i-\frac{1}{2}\sum_{i=1}^m\sum_{j=1}^m\alpha_i\alpha_jy_iy_jk(x_i,x_i)\
+s.t. \quad \sum_{i=1}^m\alpha_iy_i = 0,\quad \alpha_i&gt;=0,\quad i= 1,2,..,m.
+$$
+求解后可以得到：
+$$
+f(x) = w^T\phi(x)+b \= \sum_{i=1}^m \alpha_iy_i\phi(x_i)^T\phi(x)+b
+\ =\sum_{i=1}^m\alpha_i y_i \kappa(x,x_i)+b\ .
+$$
+这里的映射$k(·,·)$就是<strong>核函数（kwenel function）</strong>，模型的最优解可以通过训练样本的核函数展开，这一展开式也叫做**&ldquo;支持向量展式&rdquo;（support vector expansion）**</p>
+<p>核函数$k$隐式地包含在空间里，我们无法直接知道合适的核函数的存在性以及具体形式。满足以下性质的函数被称为核函数。</p>
+<h3 id="核函数的定义">核函数的定义
+</h3><blockquote>
+<p>核函数 ($\kappa(x, y)$) 是一个定义在输入空间 ($\mathcal{X}$) 上的函数，它满足以下条件：</p>
+<ol>
+<li><strong>对称性：($\kappa(x, y)$ = $\kappa(y, x)$)</strong></li>
+<li><strong>对于任意数据集 ($D = {x_1, x_2, \ldots, x_m\$)，对应的核矩阵 ( $K$ ) 是半正定的。</strong></li>
+</ol>
+</blockquote>
+<p>$$
+K = \begin{bmatrix}
+\kappa(x_1, x_1) &amp; \kappa(x_1, x_2) &amp; \cdots &amp; \kappa(x_1, x_m) \
+\kappa(x_2, x_1) &amp; \kappa(x_2, x_2) &amp; \cdots &amp; \kappa(x_2, x_m) \
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \
+\kappa(x_m, x_1) &amp; \kappa(x_m, x_2) &amp; \cdots &amp; \kappa(x_m, x_m) \
+\end{bmatrix}
+$$</p>
+<p>核函数隐含地定义了一种将输入数据从原始空间映射到一个高维特征空间的方法。在这个高维特征空间中，原本在低维空间中非线性可分的数据可能变得线性可分。这种特征空间的映射是通过核技巧实现的，而不需要显式地计算映射后的特征。</p>
+<blockquote>
+<p>只要一个对称函数所对应的核矩阵半正定，它就能作为核函数使用.事实上，对于一个半正定核矩阵，总能找到一个与之对应的映射$\phi$. 换言之，任何一个核函数都隐式地定义了一个称为&quot;再生核希尔伯特空间&quot; (Reproducing Kernel Hilbert Space ，简称 RKHS) 的特征空间.</p>
+</blockquote>
+<h3 id="常见核函数">常见核函数
+</h3><p>以下是一些常见的核函数及其参数的表格：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>表达式</th>
+<th>参数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>线性核</td>
+<td>$\kappa(x_i, x_j) = x_i^T x_j$)</td>
+<td>无</td>
+</tr>
+<tr>
+<td>多项式核</td>
+<td>$\kappa(x_i, x_j) = (x_i^T x_j + c)^d$)</td>
+<td>($d \geq 1$) 为多项式的次数，($c$) 为常数</td>
+</tr>
+<tr>
+<td>高斯核</td>
+<td>$\kappa(x_i, x_j) = \exp \left( -\frac{|x_i - x_j|^2}{2\sigma^2} \right)$)</td>
+<td>($\sigma &gt; 0$) 为高斯核的带宽（$width$）</td>
+</tr>
+<tr>
+<td>拉普拉斯核</td>
+<td>$\kappa(x_i, x_j) = \exp \left( -\frac{|x_i - x_j|}{\sigma} \right)$)</td>
+<td>($\sigma &gt; 0$)</td>
+</tr>
+<tr>
+<td>Sigmoid 核</td>
+<td>$\kappa(x_i, x_j) = \tanh (\beta x_i^T x_j + \theta)$)</td>
+<td>($\beta &gt; 0$, $\theta &lt; 0$)</td>
+</tr>
+</tbody>
+</table></div>
+<p>以下是一些常见核函数组合方式及其公式：</p>
+<p>$$
+\text{若 } \kappa_1 \text{ 和 } \kappa_2 \text{ 为核函数，则对于任意正数 } \gamma_1, \gamma_2, \text{ 其线性组合}
+$$</p>
+<p>$$
+\gamma_1 \kappa_1 + \gamma_2 \kappa_2 \tag{6.25}
+$$</p>
+<p>也是核函数；</p>
+<p>$$
+\text{若 } \kappa_1 \text{ 和 } \kappa_2 \text{ 为核函数，则核函数的直积}
+$$</p>
+<p>$$
+(\kappa_1 \otimes \kappa_2)(x, z) = \kappa_1(x, z) \kappa_2(x, z) \tag{6.26}
+$$</p>
+<p>也是核函数；</p>
+<p>$$
+\text{若 } \kappa_1 \text{ 为核函数，则对于任意函数 } g(x),
+$$</p>
+<p>$$
+\kappa(x, z) = g(x) \kappa_1(x, z) g(z) \tag{6.27}
+$$</p>
+<p>也是核函数。</p>
+<p>这些性质表明，通过不同的组合方式，可以构造新的核函数以满足特定应用需求。常见的组合方法包括核函数的加.</p>
+<h2 id="软间隔与正则化">软间隔与正则化
+</h2><p>在实际问题中，尽管样本空间可能满足线性可分，然而总有一些样本可能出现不满足约束的分布：
+<img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%ba%8c%29--SVM%5cSVM.assets%5cimage-20240728110133746.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240728110133746"
+	
+	
+></p>
+<p>所以我们的模型应该使得SVM允许一些样本犯错，这样的约束条件称为软间隔，使得一些样本可以不满足$y_i(w^Tx_i+b)&gt;=1$.</p>
+<h3 id="正则化">正则化
+</h3><p>为了描述好这个问题，我们可以将问题$min_{w,b}\frac{1}{2}||w||^2$进行正则化表示：
+$$
+\min_{w,b}\frac{1}{2}||w||^2+C\sum_{i=1}^ml_{0/1} (y_i(w^Tx_i+b)-1)
+$$
+其中$l_{0/1}$称为“0/1损失函数”：
+$$
+l_{0/1}(z)=
+\left{
+\begin{matrix}
+1,\quad z&lt;0.\
+0,\quad otherwise.\
+\end{matrix}
+\right .
+$$
+可以看到当$C$接近$+\infin$，$y_i(w^Tx_i+b)-1$必须严格满足间隔条件。</p>
+<p>由于&quot;0/1损失函数&quot;数学性质不好，所以有一些替代算是函数：</p>
+<p>以下是列出三种损失函数的表格，包含公式：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>损失函数</th>
+<th>公式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hinge 损失</td>
+<td>$$\ell_{\text{hinge}}(z) = \max(0, 1 - z)$$</td>
+</tr>
+<tr>
+<td>指数损失</td>
+<td>$$\ell_{\text{exp}}(z) = \exp(-z)$$</td>
+</tr>
+<tr>
+<td>对率损失</td>
+<td>$$\ell_{\text{log}}(z) = \log(1 + \exp(-z))$$</td>
+</tr>
+</tbody>
+</table></div>
+<p>为了方便研究，引入<strong>松弛变量(slack variables)</strong>:
+$$
+\epsilon_i = \ell_{hinge}(y_i(w^Tx_i+b))
+$$
+此时原优化问题的约束条件发生变化,以$Hinge$损失为例：
+$$
+\max(0,1-y_i(w^Tx_i+b)) = \epsilon_i\
+\
+\epsilon=
+\left{
+\begin{matrix}
+0,\quad 1-y_i(w^Tx_i+b)&lt;=0\
+1-y_i(w^Tx_i+b),\quad 1-y_i(w^Tx_i+b)&gt;0
+\end{matrix}
+\right .\
+\
+y_i(w^Tx_i+b)&gt;=1-\xi_i
+$$
+我们就得到了<strong>软间隔支持向量机</strong>：
+$$
+\min_{w,b}\frac{1}{2}||w||^2+C\sum_{i=1}^m\xi_i\
+s.t.\quad y_i(w^Tx_i+b)&gt;=1-\xi_i,\
+\epsilon_i&gt;=0\quad i=0,1,2,3,&hellip;,m.
+$$
+对于这个问题仍可以使用拉格朗日乘子法得出对偶问题：</p>
+<h3 id="软间隔svm求解">软间隔SVM求解
+</h3><p>设出目标函数，目标函数涉及一个正则项和松弛变量的惩罚项：
+$$
+L(w, b, \alpha, \xi, \mu) = \frac{1}{2} |w|^2 + C \sum_{i=1}^m \xi_i + \sum_{i=1}^m \alpha_i (1 - \xi_i - y_i (w^T x_i + b)) - \sum_{i=1}^m \mu_i \xi_i
+$$
+其中，$$\alpha_i &gt; 0$$，$$\mu_i \geq 0$$ 是拉格朗日乘子。</p>
+<p>通过对 $$w$$, $$b$$, $$\xi$$ 取偏导并令其等于零，可得：
+$$
+w = \sum_{i=1}^m \alpha_i y_i x_i
+$$</p>
+<p>$$
+0 = \sum_{i=1}^m \alpha_i y_i
+$$</p>
+<p>$$
+C = \alpha_i + \mu_i
+$$</p>
+<p>将上述结果代入原始目标函数中，可以得到对偶问题：
+$$
+\max_{\alpha} \sum_{i=1}^m \alpha_i - \frac{1}{2} \sum_{i=1}^m \sum_{j=1}^m \alpha_i \alpha_j y_i y_j x_i^T x_j
+$$</p>
+<p>$$
+\text{s.t.} \sum_{i=1}^m \alpha_i y_i = 0,
+$$</p>
+<p>$$
+0 &lt; \alpha_i &lt; C, \quad i = 1, 2, \ldots, m.
+$$</p>
+<p>通过求解上述对偶问题，可以得到支持向量机的最优解。</p>
+<p>好的，下面是详细内容，其中所有的数学符号都用 $$ 包围。</p>
+<h3 id="软间隔支持向量机的kkt条件">软间隔支持向量机的KKT条件
+</h3><p>对于软间隔支持向量机，KKT条件如下：</p>
+<p>$$
+\begin{cases}
+\alpha_i \geq 0, \
+\mu_i \geq 0, \
+y_i (f(x_i)) - 1 + \xi_i \geq 0, \
+\alpha_i (y_i (f(x_i)) - 1 + \xi_i) = 0, \
+\xi_i \geq 0, \
+\mu_i \xi_i = 0.
+\end{cases}
+$$</p>
+<ul>
+<li>$$\alpha_i \geq 0$$：拉格朗日乘子必须是非负的。</li>
+<li>$$\mu_i \geq 0$$：用于松弛变量的拉格朗日乘子必须是非负的。</li>
+<li>$$y_i (f(x_i)) - 1 + \xi_i \geq 0$$：这是约束条件，确保样本 $$i$$ 的预测结果满足软间隔约束。</li>
+<li>$$\alpha_i (y_i (f(x_i)) - 1 + \xi_i) = 0$$：这是互补松弛条件，意味着如果 $$\alpha_i$$ 非零，那么约束 $$y_i (f(x_i)) - 1 + \xi_i = 0$$ 必须严格成立。</li>
+<li>$$\xi_i \geq 0$$：松弛变量必须是非负的。</li>
+<li>$$\mu_i \xi_i = 0$$：这是互补松弛条件，意味着如果 $$\xi_i$$ 非零，那么 $$\mu_i$$ 必须是零，反之亦然。</li>
+</ul>
+<p>对于任何训练样本 $$(x_i, y_i)$$，总有 $$\alpha_i = 0$$ 或 $$y_i (f(x_i)) - 1 + \xi_i = 0$$。若 $$y_i (f(x_i)) - 1 + \xi_i &gt; 0$$，则 $$\alpha_i = 0$$，表明该样本对优化目标无影响；若 $$\alpha_i &gt; 0$$，则表明 $$y_i (f(x_i)) - 1 + \xi_i = 0$$，即该样本是支持向量。</p>
+<p>这些KKT条件描述了软间隔支持向量机的优化问题的解的性质，确保模型在满足软间隔约束的同时，最大化分类间隔。</p>
+<p>最终通过求解$\alpha_i$可以得到$w^T$和$b$的最佳值。</p>
+<h2 id="阅读材料">阅读材料
+</h2><h3 id="拉格朗日对偶问题">拉格朗日对偶问题
+</h3><p>KKT条件：结合原始约束条件，拉格朗日式的约束（求导），拉格朗日乘子的非负性以及互补松弛性</p>
+<p><img src="C:%5cUsers%5c%e5%94%90%e6%b5%a9%e9%92%8f%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20240727163326561.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240727163326561"
+	
+	
+></p>
+<p><img src="C:%5cUsers%5c%e5%94%90%e6%b5%a9%e9%92%8f%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20240727163346279.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240727163346279"
+	
+	
+></p>
+<p><img src="C:%5cUsers%5c%e5%94%90%e6%b5%a9%e9%92%8f%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20240727163400552.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240727163400552"
+	
+	
+></p>
+<h3 id="投影定理">投影定理
+</h3><p>在有限维的原始空间中，许多数据分布是非线性的，无法通过简单的线性分类器进行有效分类。通过将数据映射到更高维的特征空间，可以利用更高维空间的特性来解决这些问题。以下是一些关于为什么在有限维空间中有一个更高维的特征空间的原因：</p>
+<h4 id="hilbert空间">Hilbert空间
+</h4><p>在许多情况下，原始有限维空间的数据可以被映射到一个无限维的Hilbert空间。在这个空间中，许多复杂的非线性关系可以通过简单的线性关系来描述。这是函数空间和再生核Hilbert空间（RKHS）概念的基础。</p>
+<p>根据投影定理，任何有限维空间都可以嵌入到更高维的空间中。这个更高维的空间包含了原始空间的所有特征，同时还可以容纳更多的特征，从而使得数据分析和处理变得更加灵活和准确。</p>
+<h4 id="数学证明">数学证明
+</h4><p>考虑一个非线性映射函数 ($\phi$)，它将原始空间 ($\mathcal{X}$) 中的点映射到高维特征空间 ($\mathcal{H}$)，即：</p>
+<p>$$
+\phi: \mathcal{X} \to \mathcal{H}
+$$</p>
+<p>如果 $\mathcal{H}$ 是一个Hilbert空间，则存在一个核函数 ($k$)，使得：</p>
+<p>$$
+k(x, y) = \langle \phi(x), \phi(y) \rangle_{\mathcal{H}}
+$$</p>
+<p>这个核函数 ($k$) 定义了一个更高维的特征空间，而这个特征空间可能是无限维的。</p>
+<p>总之，在有限维空间中，通过合适的映射函数或核函数，可以构造一个更高维的特征空间，以解决原始空间中的非线性问题。这种技术在机器学习中非常重要，特别是在支持向量机和其他核方法中。</p>
+<h3 id="关于核函数的性质">关于核函数的性质
+</h3><h4 id="半正定矩阵">半正定矩阵
+</h4><p>一个矩阵 ( $K$) 被称为半正定（positive semi-definite），如果对于任意非零向量 ( $\mathbf{z}$ )，都有：</p>
+<p>$$
+\mathbf{z}^T K \mathbf{z} \geq 0
+$$</p>
+<p>也就是说，对于任何向量 ( $\mathbf{z} $)，当它与矩阵 ( $K$ ) 进行二次型运算时，结果总是非负的。半正定矩阵的一个重要性质是它的特征值非负。</p>
+<h4 id="再生核希尔伯特空间rkhs">再生核希尔伯特空间（RKHS）
+</h4><p>每一个核函数都隐含地定义了一个再生核希尔伯特空间（$RKHS$）。在这个空间中，核函数具有“再生性”，即对于任意函数 ($f$) 属于这个空间，都有：</p>
+<p>$$
+f(x) = \langle f, \kappa(x, \cdot) \rangle_{\mathcal{H}}
+$$</p>
+<p>这意味着在 RKHS 中，通过核函数可以很方便地计算内积，从而进行各种线性操作。</p>
+<p>这段话的意思是，如果我们有一个半正定的核矩阵 (K)，那么我们总能找到一个特征映射函数 ($\phi$)，将原始数据点映射到一个高维的特征空间，并且在这个特征空间中，核函数的计算就等同于特征映射后的内积。换句话说，任何一个符合条件的核函数都隐含地定义了一个再生核希尔伯特空间（RKHS）。</p>
+<h4 id="核函数与-rkhs-之间的关系">核函数与 RKHS 之间的关系
+</h4><p>根据 Mercer 定理，任何一个满足条件的半正定核函数都可以视作某个高维空间（可能是无限维空间）中的内积，即存在一个特征映射函数 ($\phi$)，使得：</p>
+<p>$$
+\kappa(x, y) = \langle \phi(x), \phi(y) \rangle_{\mathcal{H}}
+$$</p>
+<p>(与RKHS对比)这意味着，我们可以通过核函数 ($\kappa$) 定义一个特征映射 ($\phi$)，将输入数据从原始空间 ($\mathcal{X}$) 映射到一个高维的特征空间 ($\mathcal{H}$)。在这个高维空间中，核函数 ($\kappa(x, y)$) 就是特征向量 ($\phi(x)$) 和 ($\phi(y)$) 之间的内积。</p>
+<h4 id="从半正定矩阵到特征映射">从半正定矩阵到特征映射
+</h4><p>给定一个半正定的核矩阵 ($K$)，根据特征值分解（Eigenvalue Decomposition），我们可以将 ($K$) 分解为：</p>
+<p>$$
+K = Q \Lambda Q^T
+$$</p>
+<p>其中，(Q) 是特征向量矩阵，($\Lambda$) 是特征值对角矩阵。我们可以通过特征向量和特征值构造特征映射 ($\phi$)，使得 ($\phi(x_i)$) 在高维空间中的表示满足核矩阵的半正定性要求。</p>
+<h3 id="正则化-1">正则化
+</h3><h4 id="含有替代损失函数的svm目标函数">含有替代损失函数的SVM目标函数
+</h4><p>我们可以将 0/1 损失函数替换成别的替代损失函数，从而得到不同的学习模型。这些模型的性质与所用的替代函数直接相关，目标函数可以写为：</p>
+<p>$$
+\min_f \Omega(f) + C \sum_{i=1}^m \ell(f(x_i), y_i)
+$$</p>
+<p>其中：</p>
+<ul>
+<li>$$\Omega(f)$$ 称为“结构风险”（structural risk），用于描述模型 $$f$$ 的某些性质。</li>
+<li>$$\sum_{i=1}^m \ell(f(x_i), y_i)$$ 称为“经验风险”（empirical risk），用于描述模型 $$f$$ 在训练数据上的误差。</li>
+<li>$$C$$ 是一个正的常数，用于平衡结构风险和经验风险的权重。</li>
+</ul>
+<h4 id="结构风险和经验风险">结构风险和经验风险
+</h4><ul>
+<li>$$\Omega(f)$$ 用于描述模型的复杂度或平滑度。常见的 $$\Omega(f)$$ 形式包括 $$L_p$$ 范数（例如，$$L_2$$ 范数 $$|w|^2$$）等。</li>
+<li>$$\ell(f(x_i), y_i)$$ 是损失函数，用于衡量模型在样本 $$x_i$$ 上的预测值 $$f(x_i)$$ 与真实标签 $$y_i$$ 之间的差异。</li>
+</ul>
+<h4 id="正则化-2">正则化
+</h4><p>在机器学习中，正则化用于防止过拟合，确保模型在训练数据上的良好表现能够推广到未见过的数据上。目标函数中的正则化项 $$\Omega(f)$$ 可以帮助控制模型的复杂度。</p>
+<p>综上所述，含有替代损失函数的SVM目标函数通过平衡结构风险和经验风险，优化模型的性能，确保在训练数据和新数据上都有良好的表现。</p>
+<h1 id="支持向量回归svr">支持向量回归(SVR)
+</h1><h2 id="支持向量回归模型的解">支持向量回归模型的解
+</h2><p>支持向量不仅能用作分类问题，在回归问题上也能有不错的表现。</p>
+<p>类似线性回归模型，在线性回归模型中我们计算样本到线性超平面的均差来衡量损失从而得到最好的线性超平面。在支持向量回归中，我们使用间隔的定义来计算样本到超平面的“距离”。</p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%ba%8c%29--SVM%5cSVM.assets%5cimage-20240729130049456.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240729130049456"
+	
+	
+></p>
+<p>设$\epsilon$是样本能容忍的$f(x)$与$y$之间的偏差，仅当样本点在$f(x)+\epsilon$和$f(x)-\epsilon$之间再计算误差。</p>
+<p>于是SVR问题可以抽象为：
+$$
+\min_{w,b}\frac{1}{2}||w||^2+C\sum_{i=1}^m\ell_i(f(x_i)-y_i)\
+\text{其中C为正则化常数}，\ell_{\epsilon}是\epsilon 的不敏感损失函数\
+\ell_{\epsilon}(z)=\left{
+\begin{matrix}
+0,\quad if|z|&lt;=\epsilon;\
+|z|-\epsilon,\quad otherwise.\
+\end{matrix}
+\right.
+$$
+引入松弛变量$\xi_i$和$\hat\xi_i$(两侧松弛情况完全可能不同)，得到一般式：
+$$
+\min_{w,b,\xi_i,\hat\xi_i}\frac{1}{2}||w||^2+C\sum_{i=1}^m(\xi_i+\hat\xi_i)\
+s.t. f(x_i)-y_i&lt;=\epsilon+\xi_i,\
+y_i-f(x_i)&lt;=\epsilon+\hat\xi_i,\
+\xi_i&gt;=0,\hat\xi_i&gt;=0,\quad i=1,2,&hellip;,m.
+$$
+再通过拉格朗日乘子法转化为对偶问题:
+$$
+L(w,b,\alpha,\hat\alpha,\xi,\hat\xi,\mu,\hat\mu)=
+\ \frac{1}{2}||w||^2+C\sum_{i=1}^m(\xi_i+\hat\xi_i) + \sum_{i=1}^m \mu_i\xi_i+\sum_{i=1}^m\hat\mu_i\hat\xi_i\
++\sum_{i=1}^m\alpha_i(\epsilon+\xi_i-f(x_i)+y_i)+\sum_{i=1}^m\hat\alpha_i(y_i-f(x_i-\epsilon-\hat\xi_i)\ .
+$$
+求偏导得：
+$$
+w=\sum_{i=1}^m(\hat\alpha_i-\alpha_i)x_i\ ,
+\0 = \sum_{i=1}^m(\hat\alpha_i-\alpha_i)\ ,
+\C=\alpha_i+\mu_i\ ,
+\C=\hat\alpha_i+\hat\mu_i\ .
+$$</p>
+<p>代入原拉格朗日乘子式，对于支持向量回归（SVR），其对偶问题为：</p>
+<p>$$
+\max_{\alpha, \hat{\alpha}} \sum_{i=1}^m y_i (\alpha_i - \hat{\alpha_i}) - \epsilon (\alpha_i + \hat{\alpha_i}) - \frac{1}{2} \sum_{i=1}^m \sum_{j=1}^m (\alpha_i - \hat{\alpha_i})(\alpha_j - \hat{\alpha_j}) x_i^T x_j
+$$</p>
+<p>$$
+s.t.\quad \sum_{i=1}^m (\alpha_i - \hat{\alpha_i}) = 0
+$$</p>
+<p>$$
+0 \leq \alpha_i \leq C
+$$</p>
+<p>$$
+0 \leq \hat{\alpha_i} \leq C
+$$</p>
+<p>根据 KKT 条件，上述问题需要满足以下约束：</p>
+<p>$$
+\begin{cases}
+\alpha_i (f(x_i) - y_i - \epsilon - \xi_i) = 0, \
+\hat{\alpha_i} (y_i - f(x_i) - \epsilon - \hat{\xi_i}) = 0, \
+\alpha_i \hat{\alpha_i} = 0, \
+\xi_i \hat{\xi_i} = 0, \
+(C - \alpha_i) \xi_i = 0, \
+(C - \hat{\alpha_i}) \hat{\xi_i} = 0
+\end{cases}
+$$</p>
+<ul>
+<li>$$\alpha_i (f(x_i) - y_i - \epsilon - \xi_i) = 0$$: 这个条件表示当 $$\alpha_i$$ 非零时，约束 $$f(x_i) - y_i - \epsilon - \xi_i = 0$$ 必须严格成立。</li>
+<li>$$\hat{\alpha_i} (y_i - f(x_i) - \epsilon - \hat{\xi_i}) = 0$$: 这个条件表示当 $$\hat{\alpha_i}$$ 非零时，约束 $$y_i - f(x_i) - \epsilon - \hat{\xi_i} = 0$$ 必须严格成立。</li>
+<li>$$\alpha_i \hat{\alpha_i} = 0$$: 这个条件表示 $$\alpha_i$$ 和 $$\hat{\alpha_i}$$ 不能同时为非零，即它们互斥。</li>
+<li>$$\xi_i \hat{\xi_i} = 0$$: 这个条件表示 $$\xi_i$$ 和 $$\hat{\xi_i}$$ 不能同时为非零，即它们互斥。</li>
+<li>$$(C - \alpha_i) \xi_i = 0$$: 这个条件表示当 $$\xi_i$$ 非零时，$$\alpha_i$$ 必须为 $$C$$。</li>
+<li>$$(C - \hat{\alpha_i}) \hat{\xi_i} = 0$$: 这个条件表示当 $$\hat{\xi_i}$$ 非零时，$$\hat{\alpha_i}$$ 必须为 $$C$$。</li>
+</ul>
+<p>最后得到$\text{SVR}$解：
+$$
+f(x)=\sum_{i=1}^m(\hat\alpha_i-\alpha_i)x_i^Tx+b
+$$
+若考虑非线性样本空间分步，则可以有映射$\phi(x_i)=w^Tx_i+b$，$L(·)$对$w$求偏导为
+$$
+w=\sum_{i=1}^m(\hat\alpha_i-\alpha_i)\phi(x_i)\ .
+$$
+最终解为：
+$$
+f(x)=\sum_{i=1}^m(\hat\alpha_i-\alpha_i)\kappa(x,x_i)+b
+$$
+其中$\kappa(x_i,x_j)=\phi(x_i)^T \phi(x_j)$</p>
+<h2 id="核方法与核线性扩展">核方法与核线性扩展
+</h2><p>令 $\mathcal{H}$ 为核函数 $k$ 对应的再生核希尔伯特空间 (RKHS)， $|h|_{\mathcal{H}}$ 表示 $\mathcal{H}$ 空间中函数 $h$ 的范数。对于任意单调递增函数 $\phi: [0, \infty) \rightarrow [0, \infty)$ 和任意非负损失函数 $L: \mathbb{R}^m \rightarrow [0, \infty)$，优化问题</p>
+<p>$$ \min_{h \in \mathcal{H}} \phi(|h|_{\mathcal{H}}) + L(h(x_1), h(x_2), \ldots, h(x_m)) \tag{6.57} $$</p>
+<p>的解总可写为</p>
+<p>$$ h^*(x) = \sum_{i=1}^{m} \alpha_i k(x, x_i). \tag{6.58} $$</p>
+<p>表示定理对损失函数没有限制，对正则化项仅要求单调递增，甚至不要求是凸函数。这意味着对于一般的损失函数和正则化项，优化问题的最优解 $h^*(x)$ 都可表示为核函数 $k(x, x_i)$ 的线性组合。这显示出核函数的巨大威力。</p>
+<p>人们发展出一系列基于核函数的学习方法，统称为“核方法”（kernel methods）。最常见的，是通过“核化”（即引入核函数）来将线性学习器拓展为非线性学习器。下面我们以线性判别分析为例，来演示如何通过核化对其进行非线性拓展，从而得出“<strong>核线性判别分析”（Kernelized Linear Discriminant Analysis，简称 KLDA）</strong>。</p>
+<p>我们先假设可通过某种映射函数 $\phi: X \rightarrow \mathcal{F}$ 将样本映射到一个特征空间 $\mathcal{F}$，然后在 $\mathcal{F}$ 中执行线性判别分析，以求得</p>
+<p>$$ h(x) = \omega^T \phi(x). \tag{6.59} $$</p>
+<p>类似于式LDA，KLDA 的学习目标是</p>
+<p>$$ \max_{\omega} J(\omega) = \frac{\omega^T S_b \omega}{\omega^T S_w \omega}, \tag{6.60} $$</p>
+<p>其中 $S_b$ 和 $S_w$ 分别为训练样本在特征空间 $\mathcal{F}$ 中的类间散度矩阵和类内散度矩阵。令 $X_i$ 表示第 $i$ 类样本的集合，其样本数为 $m_i$；总样本数为 $m = m_0 + m_1$，类样本在特征空间 $\mathcal{F}$ 中的均值为</p>
+<p>$$ \mu_i = \frac{1}{m_i} \sum_{x \in X_i} \phi(x), $$</p>
+<p>两个散度矩阵分别为</p>
+<p>$$ S_b = \sum_{i=0}^{1} m_i (\mu_i - \mu)(\mu_i - \mu)^T, $$</p>
+<p>$$ S_w = \sum_{i=0}^{1} \sum_{x \in X_i} (\phi(x) - \mu_i)(\phi(x) - \mu_i)^T. $$</p>
+<p><strong>通常我们难以知道映射 $\phi$ 的具体形式，因此使用核函数 $k(x, y) = \langle \phi(x), \phi(y) \rangle$ 来隐式地表达这个映射和特征空间</strong> $\mathcal{F}$。把 $J(\omega)$ 作为优化问题 的损失函数，再令 $h(x) = \sum_{i=1}^{m} \alpha_i k(x, x_i)$，由表示定理，函数 $h(x)$ 可写为</p>
+<p>$$ h(x) = \sum_{i=1}^{m} \alpha_i k(x, x_i), \tag{6.64} $$</p>
+<p>于是由式$h(x) = \omega^T \phi(x).$可得</p>
+<p>$$ \omega = \sum_{i=1}^{m} \alpha_i \phi(x_i). \tag{6.65} $$</p>
+<p>令 $K \in \mathbb{R}^{m \times m}$ 为核函数 $k$ 所对应的核矩阵，其中 $K_{ij} = k(x_i, x_j)$。$1_i \in {0, 1}^{m \times 1}$ 为第 $i$ 类样本的指示向量，即 $1_i$ 的第 $j$ 个分量为 1 当且仅当第 $j$ 个样本属于第 $i$ 类，否则为 0。再令</p>
+<p>$$ \hat\mu_0=\frac{1}{m_0}K1_{0},$$</p>
+<p>$$ \hat\mu_1=\frac{1}{m_1}K1_{0},$$</p>
+<p>$$ M = (\mu_0 - \mu_1)(\mu_0 - \mu_1)^T, \tag{6.67} $$</p>
+<p>$$ N = K^T K - \sum_{i=0}^{1} \mu_i \mu_i^T. \tag{6.68} $$</p>
+<p>于是，式 $ \max_{\omega} J(\omega) = \frac{\omega^T S_b \omega}{\omega^T S_w \omega}$等价为(推导参考阅读资料)</p>
+<p>$$ J(\alpha) = \frac{\alpha^T M \alpha}{\alpha^T N \alpha}. \tag{6.69} $$</p>
+<p>显然，使用线性判别分析求解方法即可得到 $\alpha^*$(<strong>参考阅读资料的核对数几率回归</strong>)</p>
+<p>进而可由式  $h(x) = \sum_{i=1}^{m} \alpha_i k(x, x_i), \tag{6.64}$ 得到投影函数 $h(x)$。</p>
+<h2 id="阅读材料核方法和klda">阅读材料(核方法和KLDA)
+</h2><p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%ba%8c%29--SVM%5cSVM.assets%5cimage-20240729141857977.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240729141857977"
+	
+	
+></p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%ba%8c%29--SVM%5cSVM.assets%5cimage-20240729141907301.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240729141907301"
+	
+	
+></p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%ba%8c%29--SVM%5cSVM.assets%5cimage-20240729141917060.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240729141917060"
+	
+	
+></p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%ba%8c%29--SVM%5cSVM.assets%5cimage-20240729141927545.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240729141927545"
+	
+	
+></p>
+<p><img src="E:%5cziyuan%5cblog%5ccontent%5cpost%5c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%e5%9f%ba%e7%a1%80%28%e4%ba%8c%29--SVM%5cSVM.assets%5cimage-20240729141935362.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20240729141935362"
+	
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/deeplearning/">DeepLearning</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最后更新于 Aug 28, 2024 11:55 CST
+        </span>
+    </section></footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">【深度学习基础】决策树模型</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">【深度学习基础】神经网络</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"]});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 Exshine|SION
+    </section>
+    
+    <section class="powerby">
+        
+            el psy congroo <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
