@@ -2,25 +2,25 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Pages on Sion&#39;s blog</title>
-        <link>https://sion258.github.io/page/</link>
+        <link>http://localhost:1313/page/</link>
         <description>Recent content in Pages on Sion&#39;s blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Exshine|SION</copyright>
-        <lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://sion258.github.io/page/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/page/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Archives | 归档</title>
-        <link>https://sion258.github.io/archives/</link>
+        <link>http://localhost:1313/archives/</link>
         <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
         
-        <guid>https://sion258.github.io/archives/</guid>
+        <guid>http://localhost:1313/archives/</guid>
         <description></description>
         </item>
         <item>
         <title>Friends | 友链</title>
-        <link>https://sion258.github.io/friends/</link>
+        <link>http://localhost:1313/friends/</link>
         <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
         
-        <guid>https://sion258.github.io/friends/</guid>
+        <guid>http://localhost:1313/friends/</guid>
         <description>&lt;p&gt;本站主要记录个人读书笔记，学习任务以及ACG相关的归档整理，都知道情绪比知识更难整理，故有了归档的想法。&lt;/p&gt;
 &lt;p&gt;留下大人的：&lt;/p&gt;
 &lt;ul&gt;
@@ -35,21 +35,21 @@
         </item>
         <item>
         <title>About | 关于</title>
-        <link>https://sion258.github.io/about-%E5%85%B3%E4%BA%8E/</link>
+        <link>http://localhost:1313/about-%E5%85%B3%E4%BA%8E/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://sion258.github.io/about-%E5%85%B3%E4%BA%8E/</guid>
-        <description>&lt;img src="https://sion258.github.io/about-%E5%85%B3%E4%BA%8E/backgroud.png" alt="Featured image of post About | 关于" /&gt;&lt;p&gt;Sion取自紫苑·艾尔特纳姆·阿特拉西亚，意为紫苑，紫苑·艾尔特纳姆·阿特拉西亚是TYPE-MOON世界观下阿特拉斯（Altas）院下的院长，旧名为，紫苑·艾尔特纳姆·索卡莉丝。&lt;/p&gt;
+        <guid>http://localhost:1313/about-%E5%85%B3%E4%BA%8E/</guid>
+        <description>&lt;img src="http://localhost:1313/about-%E5%85%B3%E4%BA%8E/backgroud.png" alt="Featured image of post About | 关于" /&gt;&lt;p&gt;Sion取自紫苑·艾尔特纳姆·阿特拉西亚，意为紫苑，紫苑·艾尔特纳姆·阿特拉西亚是TYPE-MOON世界观下阿特拉斯（Altas）院下的院长，旧名为，紫苑·艾尔特纳姆·索卡莉丝。&lt;/p&gt;
 &lt;p&gt;本站主要记录学习笔记，折腾日常以及ACG相关，主要以galgame等作品的读后感为主。&lt;/p&gt;
 &lt;p&gt;如果你觉得有趣，欢迎订阅本博客，这是本人莫大之荣幸~&lt;/p&gt;
 </description>
         </item>
         <item>
         <title>Links | 链接</title>
-        <link>https://sion258.github.io/links-%E9%93%BE%E6%8E%A5/</link>
+        <link>http://localhost:1313/links-%E9%93%BE%E6%8E%A5/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://sion258.github.io/links-%E9%93%BE%E6%8E%A5/</guid>
+        <guid>http://localhost:1313/links-%E9%93%BE%E6%8E%A5/</guid>
         <description>&lt;p&gt;To use this feature, add &lt;code&gt;links&lt;/code&gt; section to frontmatter.&lt;/p&gt;
 &lt;p&gt;This page&amp;rsquo;s frontmatter:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -81,10 +81,10 @@
         </item>
         <item>
         <title>Search | 搜索</title>
-        <link>https://sion258.github.io/search/</link>
+        <link>http://localhost:1313/search/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://sion258.github.io/search/</guid>
+        <guid>http://localhost:1313/search/</guid>
         <description></description>
         </item>
         

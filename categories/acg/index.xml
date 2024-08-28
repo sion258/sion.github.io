@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>ACG on Sion&#39;s blog</title>
-        <link>https://sion258.github.io/categories/acg/</link>
+        <link>http://localhost:1313/categories/acg/</link>
         <description>Recent content in ACG on Sion&#39;s blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <copyright>Exshine|SION</copyright><atom:link href="https://sion258.github.io/categories/acg/index.xml" rel="self" type="application/rss+xml" /><item>
+        <copyright>Exshine|SION</copyright><atom:link href="http://localhost:1313/categories/acg/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>心与画、梦与狂咲、诗</title>
-        <link>https://sion258.github.io/p/%E5%BF%83%E4%B8%8E%E7%94%BB%E6%A2%A6%E4%B8%8E%E7%8B%82%E5%92%B2%E8%AF%97/</link>
+        <link>http://localhost:1313/p/%E5%BF%83%E4%B8%8E%E7%94%BB%E6%A2%A6%E4%B8%8E%E7%8B%82%E5%92%B2%E8%AF%97/</link>
         <pubDate>Sat, 24 Aug 2024 21:47:19 +0800</pubDate>
         
-        <guid>https://sion258.github.io/p/%E5%BF%83%E4%B8%8E%E7%94%BB%E6%A2%A6%E4%B8%8E%E7%8B%82%E5%92%B2%E8%AF%97/</guid>
-        <description>&lt;img src="https://sion258.github.io/img/4featureimg/sakuranoshi.jpg" alt="Featured image of post 心与画、梦与狂咲、诗" /&gt;&lt;h1 id=&#34;心与画梦与狂咲诗&#34;&gt;心与画、梦与狂咲、诗
+        <guid>http://localhost:1313/p/%E5%BF%83%E4%B8%8E%E7%94%BB%E6%A2%A6%E4%B8%8E%E7%8B%82%E5%92%B2%E8%AF%97/</guid>
+        <description>&lt;img src="http://localhost:1313/img/4featureimg/sakuranoshi.jpg" alt="Featured image of post 心与画、梦与狂咲、诗" /&gt;&lt;h1 id=&#34;心与画梦与狂咲诗&#34;&gt;心与画、梦与狂咲、诗
 &lt;/h1&gt;&lt;blockquote&gt;
 &lt;p&gt;わたくしといふ現象は 	仮定された有機交流電燈の 	ひとつの青い照明です。&lt;/p&gt;
 &lt;p&gt;称为”我“的现象 	是被假定的有机交流电灯的 	一盏青色照明。&lt;/p&gt;
