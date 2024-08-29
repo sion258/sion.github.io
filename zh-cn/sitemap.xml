@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/categories/</loc>
-    <lastmod>2024-08-30T00:22:45+08:00</lastmod>
+    <lastmod>2024-08-30T00:32:41+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -21,13 +21,13 @@
                 />
   </url><url>
     <loc>http://localhost:1313/tags/galgame/</loc>
-    <lastmod>2024-08-30T00:22:45+08:00</lastmod>
+    <lastmod>2024-08-30T00:32:41+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/post/</loc>
-    <lastmod>2024-08-30T00:22:45+08:00</lastmod>
+    <lastmod>2024-08-30T00:32:41+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/</loc>
-    <lastmod>2024-08-30T00:22:45+08:00</lastmod>
+    <lastmod>2024-08-30T00:32:41+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -45,7 +45,7 @@
                 />
   </url><url>
     <loc>http://localhost:1313/p/%E5%96%9C%E9%B9%8A%E7%9B%97%E8%B5%B0%E4%BA%86%E9%93%B6%E6%B1%A4%E5%8C%99/</loc>
-    <lastmod>2024-08-30T00:22:45+08:00</lastmod>
+    <lastmod>2024-08-30T00:32:41+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/p/cvyolo%E7%AE%80%E5%8D%95%E5%AE%9E%E4%BE%8B/</loc>
     <lastmod>2024-08-29T14:34:56+08:00</lastmod>
