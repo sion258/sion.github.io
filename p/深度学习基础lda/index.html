@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="LDA(线性判别分析) [TOC] 1.LDA是什么 LDA是一种解决二分类问题的线性方法。它描述，对于给定样例集，将样例点投影到一条直线上，这条直线能使异样的样例相距远，同类的样例分布靠近，对于新的样例，根据在这条直线上的投影判断属于哪一类别。 因此我们的所有任务围绕确定直线展开。 2.问题背景 首先描述问题背景，这里直接引用西瓜书原话： 这里描述的是一个二分类问题。 那么如何理解投影？ 3.投影 若已知向量$\\vec{x}$和向量$\\vec{w}$ ,求$\\vec{x}$在向量$\\vec{w}$上的投影，可以用内积表示： $$ \\vec{x} \\cdot \\vec{w} = |\\vec{x}||\\vec{w}|\\cos {\\theta} $$ 当w为单位向量，该投影为： $$ |\\vec{x}|\\cos {\\theta} $$ 因此在下图上，$y$表示target（标签），假设x与y有线性关系由参数集合$w$确定（$y = wx + b，w^T = {w,b}*$） 则任意x在直线上的投影可以认为是x根据线性关系找到的y值，那么这个投影过程表示为： $$ w^TX $$ 其中$x_i$在向量$X$方向上($X={X_1;X_2..;X_i}$) 4.离散度 前面提到需要使得“异样的样例相距远，同类的样例分布靠近”，因此我们需要一个衡量标准，异样的距离使用类间散度衡量，同样使用类内散度衡量 $ \\ {\\mu}_i$用来表示各类的均值，这里只有$\\ {\\mu_0},{\\mu_1}$,分别表示正类和负类的均值。异类之间的距离使用均值在直线的投影的距离表示： $$ ||w^T\\mu_0-w^T\\mu_1||_2^2 = w^T(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^Tw $$ 这里下标2表示2类向量的模，即欧几里得距离 同类之间使用协方差比较距离： $$ w^T(\\Sigma_0 + \\Sigma_1) w $$ $\\ {\\Sigma}$为协方差矩阵 为了简化表示，我们引入两个新概念，类间散度矩阵和类内散度矩阵。 类间散度矩阵用$\\ {S_b}$表示： $$ S_b=(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^T $$ 类内散度矩阵用$S_w$表示： $$ S_w= \\Sigma_0+\\Sigma_1 $$ 5.目标函数 为了同时考虑”使同类样例的投影点尽可能接近，可以让同类样例投影点的协方差尽可">
+<title>【深度学习基础】LDA</title>
+
+<link rel='canonical' href='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80lda/'>
+
+<link rel="stylesheet" href="/scss/style.min.acbdac8b9f8e0d832b2085923d703a03593634d0b84fd45c202d564a4be164b7.css"><meta property='og:title' content="【深度学习基础】LDA">
+<meta property='og:description' content="LDA(线性判别分析) [TOC] 1.LDA是什么 LDA是一种解决二分类问题的线性方法。它描述，对于给定样例集，将样例点投影到一条直线上，这条直线能使异样的样例相距远，同类的样例分布靠近，对于新的样例，根据在这条直线上的投影判断属于哪一类别。 因此我们的所有任务围绕确定直线展开。 2.问题背景 首先描述问题背景，这里直接引用西瓜书原话： 这里描述的是一个二分类问题。 那么如何理解投影？ 3.投影 若已知向量$\\vec{x}$和向量$\\vec{w}$ ,求$\\vec{x}$在向量$\\vec{w}$上的投影，可以用内积表示： $$ \\vec{x} \\cdot \\vec{w} = |\\vec{x}||\\vec{w}|\\cos {\\theta} $$ 当w为单位向量，该投影为： $$ |\\vec{x}|\\cos {\\theta} $$ 因此在下图上，$y$表示target（标签），假设x与y有线性关系由参数集合$w$确定（$y = wx + b，w^T = {w,b}*$） 则任意x在直线上的投影可以认为是x根据线性关系找到的y值，那么这个投影过程表示为： $$ w^TX $$ 其中$x_i$在向量$X$方向上($X={X_1;X_2..;X_i}$) 4.离散度 前面提到需要使得“异样的样例相距远，同类的样例分布靠近”，因此我们需要一个衡量标准，异样的距离使用类间散度衡量，同样使用类内散度衡量 $ \\ {\\mu}_i$用来表示各类的均值，这里只有$\\ {\\mu_0},{\\mu_1}$,分别表示正类和负类的均值。异类之间的距离使用均值在直线的投影的距离表示： $$ ||w^T\\mu_0-w^T\\mu_1||_2^2 = w^T(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^Tw $$ 这里下标2表示2类向量的模，即欧几里得距离 同类之间使用协方差比较距离： $$ w^T(\\Sigma_0 + \\Sigma_1) w $$ $\\ {\\Sigma}$为协方差矩阵 为了简化表示，我们引入两个新概念，类间散度矩阵和类内散度矩阵。 类间散度矩阵用$\\ {S_b}$表示： $$ S_b=(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^T $$ 类内散度矩阵用$S_w$表示： $$ S_w= \\Sigma_0+\\Sigma_1 $$ 5.目标函数 为了同时考虑”使同类样例的投影点尽可能接近，可以让同类样例投影点的协方差尽可">
+<meta property='og:url' content='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80lda/'>
+<meta property='og:site_name' content='Sion&#39;s blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='DeepLearn' /><meta property='article:published_time' content='2024-08-28T21:47:19&#43;08:00'/><meta property='article:modified_time' content='2024-08-28T00:18:28&#43;08:00'/>
+<meta name="twitter:title" content="【深度学习基础】LDA">
+<meta name="twitter:description" content="LDA(线性判别分析) [TOC] 1.LDA是什么 LDA是一种解决二分类问题的线性方法。它描述，对于给定样例集，将样例点投影到一条直线上，这条直线能使异样的样例相距远，同类的样例分布靠近，对于新的样例，根据在这条直线上的投影判断属于哪一类别。 因此我们的所有任务围绕确定直线展开。 2.问题背景 首先描述问题背景，这里直接引用西瓜书原话： 这里描述的是一个二分类问题。 那么如何理解投影？ 3.投影 若已知向量$\\vec{x}$和向量$\\vec{w}$ ,求$\\vec{x}$在向量$\\vec{w}$上的投影，可以用内积表示： $$ \\vec{x} \\cdot \\vec{w} = |\\vec{x}||\\vec{w}|\\cos {\\theta} $$ 当w为单位向量，该投影为： $$ |\\vec{x}|\\cos {\\theta} $$ 因此在下图上，$y$表示target（标签），假设x与y有线性关系由参数集合$w$确定（$y = wx + b，w^T = {w,b}*$） 则任意x在直线上的投影可以认为是x根据线性关系找到的y值，那么这个投影过程表示为： $$ w^TX $$ 其中$x_i$在向量$X$方向上($X={X_1;X_2..;X_i}$) 4.离散度 前面提到需要使得“异样的样例相距远，同类的样例分布靠近”，因此我们需要一个衡量标准，异样的距离使用类间散度衡量，同样使用类内散度衡量 $ \\ {\\mu}_i$用来表示各类的均值，这里只有$\\ {\\mu_0},{\\mu_1}$,分别表示正类和负类的均值。异类之间的距离使用均值在直线的投影的距离表示： $$ ||w^T\\mu_0-w^T\\mu_1||_2^2 = w^T(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^Tw $$ 这里下标2表示2类向量的模，即欧几里得距离 同类之间使用协方差比较距离： $$ w^T(\\Sigma_0 + \\Sigma_1) w $$ $\\ {\\Sigma}$为协方差矩阵 为了简化表示，我们引入两个新概念，类间散度矩阵和类内散度矩阵。 类间散度矩阵用$\\ {S_b}$表示： $$ S_b=(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^T $$ 类内散度矩阵用$S_w$表示： $$ S_w= \\Sigma_0+\\Sigma_1 $$ 5.目标函数 为了同时考虑”使同类样例的投影点尽可能接近，可以让同类样例投影点的协方差尽可">
+    <link rel="shortcut icon" href="/static/favicon/favicon.ico" />
+
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/berun_hu12995538977136868063.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">😇</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Sion&#39;s blog</a></h1>
+            <h2 class="site-description">What&#39;s the mind? No matter.What&#39;s the matter? Never mind.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/sion258'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://x.com/sh1k1_s10n'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:3218713610@qq.com'
+                        target="_blank"
+                        title="Mail"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mail" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+  <path d="M3 7l9 6l9 -6" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/15265085'
+                        target="_blank"
+                        title="bilibli"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 10a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v6a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4v-6z" />
+  <path d="M8 3l2 3" />
+  <path d="M16 3l-2 3" />
+  <path d="M9 13v-2" />
+  <path d="M15 11v2" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='http://sion258.github.io/index.xml'
+                        target="_blank"
+                        title="Rss"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="5" cy="19" r="1" />
+  <path d="M4 4a16 16 0 0 1 16 16" />
+  <path d="M4 11a9 9 0 0 1 9 9" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>home | 主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about-%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About | 关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives | 归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-friends" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M7 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+  <path d="M5 22v-5l-1 -1v-4a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4l-1 1v5" />
+  <path d="M17 5m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+  <path d="M15 22v-4h-2l2 -6a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1l2 6h-2v4" />
+</svg>
+                
+                <span>Friends | 友链</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search | 搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links-%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links | 链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="http://localhost:1313/" selected>中文</option>
+                                
+                                    <option value="http://localhost:1313/en/" >English</option>
+                                
+                                    <option value="http://localhost:1313/ar/" >عربي</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#1lda是什么">1.LDA是什么</a></li>
+    <li><a href="#2问题背景">2.问题背景</a></li>
+    <li><a href="#3投影">3.投影</a></li>
+    <li><a href="#4离散度">4.离散度</a></li>
+    <li><a href="#5目标函数">5.目标函数</a></li>
+    <li><a href="#6推广到多分类">6.推广到多分类</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/study/" >
+                STUDY
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80lda/">【深度学习基础】LDA</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 28, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="lda线性判别分析">LDA(线性判别分析)
+</h1><p>[TOC]</p>
+<h2 id="1lda是什么">1.LDA是什么
+</h2><p>LDA是一种解决二分类问题的线性方法。它描述，对于给定样例集，将样例点投影到一条直线上，这条直线能使异样的样例相距远，同类的样例分布靠近，对于新的样例，根据在这条直线上的投影判断属于哪一类别。</p>
+<p>因此我们的所有任务围绕确定直线展开。</p>
+<h2 id="2问题背景">2.问题背景
+</h2><p>首先描述问题背景，这里直接引用西瓜书原话：</p>
+<p>这里描述的是一个二分类问题。</p>
+<p>那么如何理解投影？</p>
+<h2 id="3投影">3.投影
+</h2><p>若已知向量$\vec{x}$和向量$\vec{w}$ ,求$\vec{x}$在向量$\vec{w}$上的投影，可以用内积表示：
+$$
+\vec{x} \cdot \vec{w} = |\vec{x}||\vec{w}|\cos {\theta}
+$$
+当w为单位向量，该投影为：
+$$
+|\vec{x}|\cos {\theta}
+$$
+因此在下图上，$y$表示target（标签），假设x与y有线性关系由参数集合$w$确定（$y = wx + b，w^T = {w,b}*$）</p>
+<p>则任意x在直线上的投影可以认为是x根据线性关系找到的y值，那么这个投影过程表示为：
+$$
+w^TX
+$$
+其中$x_i$在向量$X$方向上($X={X_1;X_2..;X_i}$)</p>
+<h2 id="4离散度">4.离散度
+</h2><p>前面提到需要使得“异样的样例相距远，同类的样例分布靠近”，因此我们需要一个衡量标准，异样的距离使用<strong>类间散度</strong>衡量，同样使用<strong>类内散度</strong>衡量</p>
+<p>$ \ {\mu}_i$用来表示各类的均值，这里只有$\ {\mu_0},{\mu_1}$,分别表示正类和负类的均值。异类之间的距离使用均值在直线的投影的距离表示：
+$$
+||w^T\mu_0-w^T\mu_1||_2^2 = w^T(\mu_0-\mu_1)(\mu_0-\mu_1)^Tw
+$$
+这里下标2表示2类向量的模，即欧几里得距离</p>
+<p>同类之间使用协方差比较距离：
+$$
+w^T(\Sigma_0 + \Sigma_1) w
+$$
+$\ {\Sigma}$为协方差矩阵</p>
+<p>为了简化表示，我们引入两个新概念，<strong>类间散度矩阵</strong>和<strong>类内散度矩阵</strong>。</p>
+<p>类间散度矩阵用$\ {S_b}$表示：
+$$
+S_b=(\mu_0-\mu_1)(\mu_0-\mu_1)^T
+$$
+类内散度矩阵用$S_w$表示：
+$$
+S_w= \Sigma_0+\Sigma_1
+$$</p>
+<h2 id="5目标函数">5.目标函数
+</h2><p>为了同时考虑”<strong>使同类样例的投影点尽可能接近，可以让同类样例投影点的协方差尽可</strong></p>
+<p><strong>能小</strong>“，设置目标函数：
+$$
+J=\frac{w^TS_bw}{w^TS_ww}
+$$
+求这个目标函数的最大值可以转换为求$\ S_b$和$\ S_w$的**”广义瑞利商“**，这里使用拉格朗日乘子法求解，具体过程不在讨论范围。</p>
+<p>$$
+min\quad ω^TS_bw\
+s.t.\quad w^TS_ww = 1 .
+$$
+最终求得$\ w = S^{-1}(\mu_0-\mu_1)$</p>
+<h2 id="6推广到多分类">6.推广到多分类
+</h2><p>在多分类问题中，LDA一般作为降维方法进行属性约简。设target数量为N,$\mu$为所有数据的均值，$\ {\mu_i}$表示示属性i的均值,$m_i$表示第i属性的数据量。</p>
+<p>首先定义”全局散度矩阵“：
+$$
+S_t=S_b+S_w=\sum_{i=1}^m({x_i}-\mu)({x_i}-\mu)^T
+$$
+$\ {S_w}$ 可以表示为：
+$$
+{S_w}<em>i = \sum</em>{x\in X_i} \Sigma_i = \sum_{x\in X_i} \ (x-\mu_i)(x-\mu_i)^T\
+S_w = \sum_{i=1}^N S_{wi}
+$$</p>
+<p>$\ {S_b}$可以表示为：
+$$
+S_b=\sum_{i=1}^Nm_i(\mu_i-\mu)(\mu_i-\mu)^T
+$$
+推导参考：</p>
+<p>多分类 LDA 可以有多种实现方法，使用 $S_w$, $S_t$ 两者中的任何两个即可。常见的一种实现是采用优化目标</p>
+<p>$$
+max_W{\frac{tr(W^TS_bW)}{tr(W^TS_wW)}}
+$$
+$tr(\cdot)$表示矩阵的迹（trace）即矩阵对角线上元素的和，我们在LDA中要做的是找到一个投影矩阵$W$，使得这个比值最大化。</p>
+<p>该式可以转换为一个最大广义特征值的问题的求解：
+$$
+S_bW=\lambda S_wW
+$$
+<strong>$W$的闭式解则是 $S_w ^{-1}S_b$_的N-1个最大广义特征值所对应的特征向量组成的矩阵</strong>，即我们要求的投影矩阵</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/deeplearn/">DeepLearn</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            最后更新于 Aug 28, 2024 00:18 CST
+        </span>
+    </section></footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <script src='//unpkg.com/@waline/client@v2/dist/waline.js'></script>
+<link href='//unpkg.com/@waline/client@v2/dist/waline.css' rel='stylesheet'/>
+<div id="waline" class="waline-container"></div>
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        --waline-font-size: var(--article-font-size);
+    }
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style><script>
+    
+    Waline.init({"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://unpkg.com/@waline/emojis@1.0.1/weibo"],"locale":{"admin":"Admin","placeholder":null},"requiredMeta":["name","email","url"]});
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2024 Exshine|SION
+    </section>
+    
+    <section class="powerby">
+        
+            el psy congroo <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
