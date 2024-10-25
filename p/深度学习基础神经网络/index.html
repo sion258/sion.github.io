@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="神经网络（neural networks） 神经元 感知机模型（Perceptron） 感知机模型 感知机是由神经元复合的线性分类器。 $$ y =f(\\sum_{i=1}^n w_ix_i -\\theta) = f(w^Tx-\\theta) $$ 其中： x为样本的特征向量。 w为权重向量。 θ称为偏置（阈值） 如何这里的$f$为阶跃函数$\\epsilon(·)$，则感知机模型可以表示为激活函数： $$ (1)y =\\epsilon(w^Tx-\\theta) =\\left{ \\begin{matrix} \\ 1,w^Tx&gt;=\\theta\\ \\ 0,w^Tx&lt;\\theta \\end{matrix} \\right. $$ 由$n$维空间中的超平面方程： $$ w_1x_1+w_2x_2+w_3x_3+&hellip;+w_nx_n+b=w^Tx+b=0 $$ 可知$(1)$式将n维空间划分，可以看作一个超平面，将n维空间划分为$w^Tx&gt;=\\theta$和$w^Tx&lt;\\theta$两个空间，落在前者的输出值为1，后者的输出值为0，于是实现了分类功能。 感知机的学习策略以及参数的调整规则 所以线性模型中的思考，我们需要对权重向量$w^T$和偏置$\\theta$进行选择，这就是感知机的学习 不妨考虑一种简单的情况，现在有特征矩阵$x_1$=[2, 3]，$x_2$=[1,5]，包含标签的向量$y={1,0}$ 初始化权重向量$w$：假设$w=[1,1]$，偏置$\\theta=2$； 计算输出： 根据公式$(1)$, 有$w^Tx_1-\\theta=1·2+1·3-2=3&gt;0$, 因此被判定为1，符合真实输出； 对于$x_2$，计算得到$w^Tx_2-\\theta = 6-2=4&gt;0$，不符合输出，因此需要调整权重向量$w$和偏置$\\theta$ 提出以下优化规则： $$ w&rsquo; = w+η(y-y_{pred})x\\ \\theta&rsquo;=\\theta-η(y-y_{pred}) $$ \u200b\t假设模型的学习率$η$为1，于是$w&rsquo; = w + η(0-1)·[1,5] = [0,-4]$,$\\theta&rsquo; = 2 + 1 =3$ 对于$x_1$，再次计算$w^Tx_1-\\theta= -15 &lt; 0$，与真实输出不符； 对于$x_2$，易得$w^Tx_1-\\theta = -23 &lt; 0$，输出为0符合标签 由于输出仍不满足，因此继续根据规则调整权重和偏置验证计算。">
 <title>【深度学习基础】神经网络</title>
 
-<link rel='canonical' href='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/'>
+<link rel='canonical' href='https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/'>
 
 <link rel="stylesheet" href="/scss/style.min.acbdac8b9f8e0d832b2085923d703a03593634d0b84fd45c202d564a4be164b7.css"><meta property='og:title' content="【深度学习基础】神经网络">
 <meta property='og:description' content="神经网络（neural networks） 神经元 感知机模型（Perceptron） 感知机模型 感知机是由神经元复合的线性分类器。 $$ y =f(\\sum_{i=1}^n w_ix_i -\\theta) = f(w^Tx-\\theta) $$ 其中： x为样本的特征向量。 w为权重向量。 θ称为偏置（阈值） 如何这里的$f$为阶跃函数$\\epsilon(·)$，则感知机模型可以表示为激活函数： $$ (1)y =\\epsilon(w^Tx-\\theta) =\\left{ \\begin{matrix} \\ 1,w^Tx&gt;=\\theta\\ \\ 0,w^Tx&lt;\\theta \\end{matrix} \\right. $$ 由$n$维空间中的超平面方程： $$ w_1x_1+w_2x_2+w_3x_3+&hellip;+w_nx_n+b=w^Tx+b=0 $$ 可知$(1)$式将n维空间划分，可以看作一个超平面，将n维空间划分为$w^Tx&gt;=\\theta$和$w^Tx&lt;\\theta$两个空间，落在前者的输出值为1，后者的输出值为0，于是实现了分类功能。 感知机的学习策略以及参数的调整规则 所以线性模型中的思考，我们需要对权重向量$w^T$和偏置$\\theta$进行选择，这就是感知机的学习 不妨考虑一种简单的情况，现在有特征矩阵$x_1$=[2, 3]，$x_2$=[1,5]，包含标签的向量$y={1,0}$ 初始化权重向量$w$：假设$w=[1,1]$，偏置$\\theta=2$； 计算输出： 根据公式$(1)$, 有$w^Tx_1-\\theta=1·2+1·3-2=3&gt;0$, 因此被判定为1，符合真实输出； 对于$x_2$，计算得到$w^Tx_2-\\theta = 6-2=4&gt;0$，不符合输出，因此需要调整权重向量$w$和偏置$\\theta$ 提出以下优化规则： $$ w&rsquo; = w+η(y-y_{pred})x\\ \\theta&rsquo;=\\theta-η(y-y_{pred}) $$ \u200b\t假设模型的学习率$η$为1，于是$w&rsquo; = w + η(0-1)·[1,5] = [0,-4]$,$\\theta&rsquo; = 2 + 1 =3$ 对于$x_1$，再次计算$w^Tx_1-\\theta= -15 &lt; 0$，与真实输出不符； 对于$x_2$，易得$w^Tx_1-\\theta = -23 &lt; 0$，输出为0符合标签 由于输出仍不满足，因此继续根据规则调整权重和偏置验证计算。">
-<meta property='og:url' content='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/'>
+<meta property='og:url' content='https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/'>
 <meta property='og:site_name' content='Sion&#39;s blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='DeepLearning' /><meta property='article:published_time' content='2024-08-28T11:37:10&#43;08:00'/><meta property='article:modified_time' content='2024-08-28T11:41:36&#43;08:00'/>
 <meta name="twitter:title" content="【深度学习基础】神经网络">
@@ -317,11 +317,11 @@
 
                             <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
                                 
-                                    <option value="http://localhost:1313/" selected>中文</option>
+                                    <option value="https://sion258.github.io/" selected>中文</option>
                                 
-                                    <option value="http://localhost:1313/en/" >English</option>
+                                    <option value="https://sion258.github.io/en/" >English</option>
                                 
-                                    <option value="http://localhost:1313/ar/" >عربي</option>
+                                    <option value="https://sion258.github.io/ar/" >عربي</option>
                                 
                             </select>
                         </li>
@@ -1070,6 +1070,19 @@ $$</p>
 
         <div class="article-details">
             <h2 class="article-title">【深度学习基础】SVM</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/smo%E7%AE%97%E6%B3%95%E4%BB%A5%E5%9C%A8svm%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E4%B8%BA%E4%BE%8B/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">SMO算法（以在SVM中的应用为例）</h2>
         </div>
     </a>
 </article>

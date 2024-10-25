@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>DeepLearning on Sion&#39;s blog</title>
-        <link>http://localhost:1313/tags/deeplearning/</link>
+        <link>https://sion258.github.io/tags/deeplearning/</link>
         <description>Recent content in DeepLearning on Sion&#39;s blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Exshine|SION</copyright>
-        <lastBuildDate>Wed, 28 Aug 2024 11:37:37 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/deeplearning/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Wed, 28 Aug 2024 11:37:37 +0800</lastBuildDate><atom:link href="https://sion258.github.io/tags/deeplearning/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>【深度学习基础】决策树模型</title>
-        <link>http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/</link>
+        <link>https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/</link>
         <pubDate>Wed, 28 Aug 2024 11:37:37 +0800</pubDate>
         
-        <guid>http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/</guid>
+        <guid>https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/</guid>
         <description>&lt;h1 id=&#34;决策树&#34;&gt;决策树
 &lt;/h1&gt;&lt;h2 id=&#34;回顾线性模型&#34;&gt;回顾线性模型
 &lt;/h2&gt;&lt;p&gt;在线性模型中，对于一个拥有i个属性的数据集我们通过构造$y = WX(W = (w,b)^*,X = (x_1;x_2;&amp;hellip;;x_i)$根据均方方差最小化或者对数几率最大化来进行线性回归或者对数几率回归来确定$W$，得到模型从而模拟得到输出y与数据集$X$的线性关系，其中对数几率回归由于输出的是概率因此被用作分类任务的一部分。而线性判别分析通过类间散度矩阵$S_b$和类内散度矩阵$S_w$拟合一个目标函数使得$S_b$和$S_w$的广义瑞利商最大，最后求得$W$的闭式解，通过将输出的值离散化为类别从而达到分类的目的。具体来说：&lt;/p&gt;
@@ -989,10 +989,10 @@ $ Gini(D)$ 越小，则数据集$D$的纯度越高.&lt;/p&gt;
         </item>
         <item>
         <title>【深度学习基础】神经网络</title>
-        <link>http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
+        <link>https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link>
         <pubDate>Wed, 28 Aug 2024 11:37:10 +0800</pubDate>
         
-        <guid>http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
+        <guid>https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid>
         <description>&lt;h1 id=&#34;神经网络neural-networks&#34;&gt;神经网络（neural networks）
 &lt;/h1&gt;&lt;h2 id=&#34;神经元&#34;&gt;神经元
 &lt;/h2&gt;&lt;h2 id=&#34;感知机模型perceptron&#34;&gt;感知机模型（Perceptron）
@@ -1493,10 +1493,10 @@ $$&lt;/p&gt;
         </item>
         <item>
         <title>【深度学习基础】SVM</title>
-        <link>http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80svm/</link>
+        <link>https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80svm/</link>
         <pubDate>Tue, 27 Aug 2024 11:35:03 +0800</pubDate>
         
-        <guid>http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80svm/</guid>
+        <guid>https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80svm/</guid>
         <description>&lt;h1 id=&#34;支持向量机svm&#34;&gt;支持向量机（SVM）
 &lt;/h1&gt;&lt;p&gt;[TOC]&lt;/p&gt;
 &lt;p&gt;在感知机模型中，我们通过找到一个超平面$w^Tx - \theta = 0$来将样本空间划分来完成分类任务，在感知机模型中，主要通过设置$w^T和\theta$的更新公式完成超平面的确定。现在我们考虑最合适的超平面的确认方式&amp;ndash;&lt;strong&gt;超平面离样本尽可能远离并且正好处于“正中间”&lt;/strong&gt;。这就是SVM想要求解的情形。&lt;/p&gt;

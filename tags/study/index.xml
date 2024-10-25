@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Study on Sion&#39;s blog</title>
+        <link>https://sion258.github.io/tags/study/</link>
+        <description>Recent content in Study on Sion&#39;s blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>Exshine|SION</copyright>
+        <lastBuildDate>Sat, 31 Aug 2024 23:07:36 +0800</lastBuildDate><atom:link href="https://sion258.github.io/tags/study/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>SMO算法（以在SVM中的应用为例）</title>
+        <link>https://sion258.github.io/p/smo%E7%AE%97%E6%B3%95%E4%BB%A5%E5%9C%A8svm%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E4%B8%BA%E4%BE%8B/</link>
+        <pubDate>Sat, 31 Aug 2024 23:07:36 +0800</pubDate>
+        
+        <guid>https://sion258.github.io/p/smo%E7%AE%97%E6%B3%95%E4%BB%A5%E5%9C%A8svm%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E4%B8%BA%E4%BE%8B/</guid>
+        <description>&lt;h2 id=&#34;凸二次规划问题凸qp&#34;&gt;凸二次规划问题（凸QP）
+&lt;/h2&gt;&lt;p&gt;二次规划是一类优化问题&lt;/p&gt;
+&lt;p&gt;一般的二次规划问题可以表示为：&lt;/p&gt;
+&lt;p&gt;$$
+\text{minimize: } f(x) = \frac{1}{2} x^T Q x + c^T x
+$$&lt;/p&gt;
+&lt;p&gt;$$
+\text{subject to: } Ax \leq b
+$$&lt;/p&gt;
+&lt;p&gt;$$
+Ex = d
+$$&lt;/p&gt;
+&lt;p&gt;其中：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;(x)&lt;/strong&gt; 是需要优化的变量向量。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;(Q)&lt;/strong&gt; 是一个对称正定矩阵，定义了目标函数中的二次项 (x^T Q x)。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;(c)&lt;/strong&gt; 是一个向量，定义了目标函数中的线性项 (c^T x)。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;(A)&lt;/strong&gt; 和 &lt;strong&gt;(E)&lt;/strong&gt; 是矩阵，定义了线性不等式约束 (Ax \leq b) 和线性等式约束 (Ex = d)。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;(b)&lt;/strong&gt; 和 &lt;strong&gt;(d)&lt;/strong&gt; 是约束条件中的向量。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;二次规划的特性&#34;&gt;二次规划的特性
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;二次目标函数&lt;/strong&gt;：目标函数中的二次项 (x^T Q x) 赋予了优化问题非线性特性。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;线性约束&lt;/strong&gt;：约束条件全部是线性的，包括不等式和等式。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;凸性&lt;/strong&gt;：若矩阵 (Q) 是正定的，目标函数则是凸的，因此该二次规划问题为&lt;strong&gt;凸优化问题&lt;/strong&gt;，在这种情况下，任何局部最优解即为全局最优解。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;svm优化目标&#34;&gt;SVM优化目标
+&lt;/h2&gt;&lt;p&gt;周所周知，SVM的对偶优化问题可以表述为：&lt;/p&gt;
+&lt;p&gt;$\min_{\alpha}\quad\frac{1}{2}\sum_{i=1}^N\sum_{j=1}^N\alpha_i\alpha_jy_iy_jK(x_1,x_j)-\sum_{i=1}^N\alpha_i$&lt;/p&gt;
+&lt;p&gt;$s.t. \quad \sum_{i=1}^N\alpha_iy_i=0$&lt;/p&gt;
+&lt;p&gt;$0&amp;lt;=\alpha_i&amp;lt;=C,\quad i=1,2,3,4,5,6,&amp;hellip;,N$&lt;/p&gt;
+&lt;p&gt;$\alpha_i$是拉格朗日乘子，一个$\alpha_i$对于一个样本点变量。&lt;/p&gt;
+&lt;p&gt;SMO算法通过将上述问题转化为两个变量的二次规划问题，不失一般性的，选取变量$\alpha_1,\alpha_2$作为变量，SMO最优化问题可以写成：
+$$
+\text{minimize: } W(\alpha_1, \alpha_2) = \frac{1}{2} \left(\alpha_1^2 K_{11} + \alpha_2^2 K_{22} + 2 \alpha_1 \alpha_2 K_{12} \right) + \alpha_1 (\nabla_{\alpha_1}) + \alpha_2 (\nabla_{\alpha_2})
+$$&lt;/p&gt;
+&lt;p&gt;$$
+\text{subject to: }
+\begin{cases}
+y_1 \alpha_1 + y_2 \alpha_2 = \text{constant} \
+0 \leq \alpha_1, \alpha_2 \leq C
+\end{cases}
+$$&lt;/p&gt;
+&lt;p&gt;该问题的求解可以通过SMO算法的迭代步骤来实现，每次迭代仅优化两个变量，逐步逼近全局最优解。&lt;/p&gt;
+&lt;h2 id=&#34;推理&#34;&gt;推理
+&lt;/h2&gt;&lt;p&gt;在SMO算法中，我们通过选择两个变量 (\alpha_1) 和 (\alpha_2) 来简化优化问题，具体的解过程如下：&lt;/p&gt;
+&lt;h3 id=&#34;1-目标函数&#34;&gt;1. 目标函数
+&lt;/h3&gt;&lt;p&gt;首先，我们要最小化以下目标函数：&lt;/p&gt;
+&lt;p&gt;$$
+W(\alpha_1, \alpha_2) = \frac{1}{2} \left(\alpha_1^2 K_{11} + \alpha_2^2 K_{22} + 2 \alpha_1 \alpha_2 K_{12} \right) + \alpha_1 \nabla_{\alpha_1} + \alpha_2 \nabla_{\alpha_2}
+$$&lt;/p&gt;
+&lt;p&gt;其中：&lt;/p&gt;
+&lt;p&gt;$$
+\nabla_{\alpha_1} = -1 + y_1 \sum_{i} \alpha_i y_i K(x_1, x_i)
+$$&lt;/p&gt;
+&lt;p&gt;$$
+\nabla_{\alpha_2} = -1 + y_2 \sum_{i} \alpha_i y_i K(x_2, x_i)
+$$&lt;/p&gt;
+&lt;h3 id=&#34;2-约束条件&#34;&gt;2. 约束条件
+&lt;/h3&gt;&lt;p&gt;这两个变量必须满足以下约束条件：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;线性约束&lt;/strong&gt;：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+y_1 \alpha_1 + y_2 \alpha_2 = \text{constant}
+$$&lt;/p&gt;
+&lt;p&gt;这个常数通常由初始条件决定。假设我们有一个初始值$ \alpha_1^{old} $和$ \alpha_2^{old}$，那么：&lt;/p&gt;
+&lt;p&gt;$$
+\alpha_2 = \alpha_2^{old} + y_2 \cdot y_1 \cdot (\alpha_1^{old} - \alpha_1)
+$$&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;&lt;strong&gt;边界约束&lt;/strong&gt;：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;$$
+0 \leq \alpha_1 \leq C
+$$&lt;/p&gt;
+&lt;p&gt;$$
+0 \leq \alpha_2 \leq C
+$$&lt;/p&gt;
+&lt;h3 id=&#34;3-解的过程&#34;&gt;3. 解的过程
+&lt;/h3&gt;&lt;h4 id=&#34;31-计算-alpha_2-的无约束最优解&#34;&gt;3.1. 计算 ($\alpha_2$) 的无约束最优解
+&lt;/h4&gt;&lt;p&gt;首先，我们在满足线性约束的条件下计算 ($\alpha_2$) 的无约束最优解。将线性约束代入目标函数，得到关于 ($\alpha_1$) 的函数：&lt;/p&gt;
+&lt;p&gt;$$
+W(\alpha_1) = \frac{1}{2} A \alpha_1^2 + B \alpha_1 + C
+$$&lt;/p&gt;
+&lt;p&gt;其中，&lt;/p&gt;
+&lt;p&gt;$$
+A = K_{11} + K_{22} - 2 K_{12}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+B = - y_2 \cdot (\alpha_2^{old} + y_2 \cdot y_1 \cdot (\alpha_1^{old} - \alpha_1)) + y_1 \cdot (1 - y_1 \cdot \sum_i \alpha_i y_i K(x_1, x_i))
+$$&lt;/p&gt;
+&lt;p&gt;$$
+C = \frac{1}{2} (\alpha_1^{old})^2 K_{11} + \frac{1}{2} (\alpha_2^{old})^2 K_{22} + \alpha_1^{old} \alpha_2^{old} K_{12} + \alpha_1^{old} \nabla_{\alpha_1} + \alpha_2^{old} \nabla_{\alpha_2}
+$$&lt;/p&gt;
+&lt;p&gt;求导数并设置为零，得到：&lt;/p&gt;
+&lt;p&gt;$$
+\alpha_1^{new} = \alpha_1^{old} + \frac{y_1 \cdot (\nabla_{\alpha_2} - \nabla_{\alpha_1})}{A}
+$$&lt;/p&gt;
+&lt;p&gt;然后利用线性约束计算 ($\alpha_2^{new}$)：&lt;/p&gt;
+&lt;p&gt;$$
+\alpha_2^{new} = \alpha_2^{old} + y_2 \cdot y_1 \cdot (\alpha_1^{old} - \alpha_1^{new})
+$$&lt;/p&gt;
+&lt;h4 id=&#34;32-投影到可行区域&#34;&gt;3.2. 投影到可行区域
+&lt;/h4&gt;&lt;p&gt;计算出的 ($\alpha_1^{new}$) 和 ($\alpha_2^{new}$) 可能不满足边界约束，因此需要进行投影，使它们在 ([0, C]) 区间内。&lt;/p&gt;
+&lt;p&gt;首先对 ($\alpha_1^{new}$) 进行修正：&lt;/p&gt;
+&lt;p&gt;$$
+\alpha_1^{new} = \text{clip}(\alpha_1^{new}, 0, C)
+$$&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;（具体定义如下：&lt;/p&gt;
+&lt;p&gt;$$
+\text{clip}(x, \text{min}, \text{max}) =
+\begin{cases}
+\text{min}, &amp;amp; \text{if } x &amp;lt; \text{min} \
+x, &amp;amp; \text{if } \text{min} \leq x \leq \text{max} \
+\text{max}, &amp;amp; \text{if } x &amp;gt; \text{max}
+\end{cases}
+$$&lt;/p&gt;
+&lt;p&gt;在这个例子中，($\text{clip}(\alpha_1^{\text{new}}, 0, C)$) 的含义是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果 ($\alpha_1^{\text{new}} &amp;lt; 0$)，则将其设为 (0)。&lt;/li&gt;
+&lt;li&gt;如果 ($\alpha_1^{\text{new}} &amp;gt; C$)，则将其设为 (C)。&lt;/li&gt;
+&lt;li&gt;如果 ($0 \leq \alpha_1^{\text{new}} \leq C$)，则保持其值不变。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这个操作确保 ($\alpha_1^{\text{new}}$) 和 ($\alpha_2^{\text{new}}$) 均满足边界约束 ($0 \leq \alpha_1, \alpha_2 \leq C$)。）&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;然后利用线性约束重新计算 ($\alpha_2^{new}$)：
+$$
+\alpha_2^{new} = \alpha_2^{old} + y_2 \cdot y_1 \cdot (\alpha_1^{old} - \alpha_1^{new})
+$$&lt;/p&gt;
+&lt;p&gt;同样对 ($\alpha_2^{new}$) 进行修正(加上约束)：&lt;/p&gt;
+&lt;p&gt;$$
+\alpha_2^{new} = \text{clip}(\alpha_2^{new}, 0, C)
+$$&lt;/p&gt;
+&lt;h4 id=&#34;33-更新拉格朗日乘子和偏置项&#34;&gt;3.3. 更新拉格朗日乘子和偏置项
+&lt;/h4&gt;&lt;p&gt;最后，更新拉格朗日乘子 ($\alpha_1$) 和 ($\alpha_2$)，并更新SVM的偏置项 ($b$)，以保证对偶问题的最优解。&lt;/p&gt;
+&lt;h3 id=&#34;4-完整迭代&#34;&gt;4. 完整迭代
+&lt;/h3&gt;&lt;p&gt;SMO算法不断重复上述过程，选择两个违反KKT条件最严重的变量进行优化，直到所有变量都满足KKT条件，算法收敛为止。&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

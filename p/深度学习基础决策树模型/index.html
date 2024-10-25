@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="决策树 回顾线性模型 在线性模型中，对于一个拥有i个属性的数据集我们通过构造$y = WX(W = (w,b)^*,X = (x_1;x_2;&hellip;;x_i)$根据均方方差最小化或者对数几率最大化来进行线性回归或者对数几率回归来确定$W$，得到模型从而模拟得到输出y与数据集$X$的线性关系，其中对数几率回归由于输出的是概率因此被用作分类任务的一部分。而线性判别分析通过类间散度矩阵$S_b$和类内散度矩阵$S_w$拟合一个目标函数使得$S_b$和$S_w$的广义瑞利商最大，最后求得$W$的闭式解，通过将输出的值离散化为类别从而达到分类的目的。具体来说： 在线性模型中，对于一个拥有 $i$个属性的数据集，我们通过构造 $$y = WX$$（其中 $$W = (w_1, w_2, \\ldots, w_i, b)^T$$，$$X = (x_1, x_2, \\ldots, x_i, 1)^T$$）(x1,x2,…,xi 是输入数据的特征)，根据最小化均方误差来进行线性回归，确定 $$W$$ 的取值，从而拟合模型，得到输出 $$y$$ 与数据集 $$X$$ 之间的线性关系。 对数几率回归通过构造 $$P(y=1|X) = \\sigma(WX)$$（其中 $$\\sigma(z) = \\frac{1}{1 + e^{-z}}$$ 是Sigmoid函数），输出的是概率，因此被用作分类任务的一部分。模型通过最大化对数似然函数来确定 $$W$$ 的取值，通常使用迭代优化算法而非闭式解。 线性判别分析通过类间散度矩阵 $$S_b$$ 和类内散度矩阵 $$S_w$$ 拟合一个目标函数，使得 $$S_b$$ 和 $$S_w$$ 的广义瑞利商最大，最后求得 $$W$$ 的闭式解($S_w ^{-1}S_b$_的N-1个最大广义特征值所对应的特征向量组成的矩阵),。通过将输出的值离散化为类别从而达到分类的目的。 决策树的引入 在分类问题中，决策树比线性模型生动得多。决策树是一种划分策略，它通过一系列二分判断划分数据空间，并生成树状结构，每个节点表示一次决策后的数据集，边表示决策后数据集的分裂，叶子节点为最终输出的类别标签。决策树的引入是自然的，符合人们认识事物的规律，当判断一个瓜是好瓜还是坏瓜，我们根据西瓜的颜色瓜蒂等属性进行一系列二分，最后形成一套仅通过输入属性以及属性值就能判断瓜好坏的“模型”。（属性与特征在这里同义） 以下是一个简单的西瓜数据集示例，包含一些离散属性和属性值： 色泽 根蒂 敲声 纹理 脐部 触感 好瓜 青绿 蜷缩 浊响 清晰 凹陷 硬滑 是 乌黑 蜷缩 沉闷 清晰 凹陷 硬滑 是 乌黑 蜷缩 浊响 清晰 凹陷 硬滑 是 青绿 蜷缩 沉闷 清晰 凹陷 硬滑 是 浅白 蜷缩 浊响 清晰 凹陷 硬滑 是 青绿 稍蜷 浊响 清晰 稍凹 软粘 是 乌黑 稍蜷 浊响 稍糊 稍凹 软粘 是 乌黑 稍蜷 浊响 清晰 稍凹 硬滑 是 乌黑 稍蜷 沉闷 稍糊 稍凹 硬滑 否 青绿 硬挺 清脆 清晰 平坦 软粘 否 浅白 硬挺 清脆 模糊 平坦 硬滑 否 浅白 蜷缩 浊响 模糊 平坦 软粘 否 青绿 蜷缩 浊响 稍糊 凹陷 硬滑 否 浅白 蜷缩 浊响 清晰 稍凹 硬滑 否 乌黑 稍蜷 沉闷 稍糊 稍凹 软粘 否 这个表格展示了每个西瓜样本的属性及其对应的好瓜（是）或坏瓜（否）标签。">
 <title>【深度学习基础】决策树模型</title>
 
-<link rel='canonical' href='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/'>
+<link rel='canonical' href='https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/'>
 
 <link rel="stylesheet" href="/scss/style.min.acbdac8b9f8e0d832b2085923d703a03593634d0b84fd45c202d564a4be164b7.css"><meta property='og:title' content="【深度学习基础】决策树模型">
 <meta property='og:description' content="决策树 回顾线性模型 在线性模型中，对于一个拥有i个属性的数据集我们通过构造$y = WX(W = (w,b)^*,X = (x_1;x_2;&hellip;;x_i)$根据均方方差最小化或者对数几率最大化来进行线性回归或者对数几率回归来确定$W$，得到模型从而模拟得到输出y与数据集$X$的线性关系，其中对数几率回归由于输出的是概率因此被用作分类任务的一部分。而线性判别分析通过类间散度矩阵$S_b$和类内散度矩阵$S_w$拟合一个目标函数使得$S_b$和$S_w$的广义瑞利商最大，最后求得$W$的闭式解，通过将输出的值离散化为类别从而达到分类的目的。具体来说： 在线性模型中，对于一个拥有 $i$个属性的数据集，我们通过构造 $$y = WX$$（其中 $$W = (w_1, w_2, \\ldots, w_i, b)^T$$，$$X = (x_1, x_2, \\ldots, x_i, 1)^T$$）(x1,x2,…,xi 是输入数据的特征)，根据最小化均方误差来进行线性回归，确定 $$W$$ 的取值，从而拟合模型，得到输出 $$y$$ 与数据集 $$X$$ 之间的线性关系。 对数几率回归通过构造 $$P(y=1|X) = \\sigma(WX)$$（其中 $$\\sigma(z) = \\frac{1}{1 + e^{-z}}$$ 是Sigmoid函数），输出的是概率，因此被用作分类任务的一部分。模型通过最大化对数似然函数来确定 $$W$$ 的取值，通常使用迭代优化算法而非闭式解。 线性判别分析通过类间散度矩阵 $$S_b$$ 和类内散度矩阵 $$S_w$$ 拟合一个目标函数，使得 $$S_b$$ 和 $$S_w$$ 的广义瑞利商最大，最后求得 $$W$$ 的闭式解($S_w ^{-1}S_b$_的N-1个最大广义特征值所对应的特征向量组成的矩阵),。通过将输出的值离散化为类别从而达到分类的目的。 决策树的引入 在分类问题中，决策树比线性模型生动得多。决策树是一种划分策略，它通过一系列二分判断划分数据空间，并生成树状结构，每个节点表示一次决策后的数据集，边表示决策后数据集的分裂，叶子节点为最终输出的类别标签。决策树的引入是自然的，符合人们认识事物的规律，当判断一个瓜是好瓜还是坏瓜，我们根据西瓜的颜色瓜蒂等属性进行一系列二分，最后形成一套仅通过输入属性以及属性值就能判断瓜好坏的“模型”。（属性与特征在这里同义） 以下是一个简单的西瓜数据集示例，包含一些离散属性和属性值： 色泽 根蒂 敲声 纹理 脐部 触感 好瓜 青绿 蜷缩 浊响 清晰 凹陷 硬滑 是 乌黑 蜷缩 沉闷 清晰 凹陷 硬滑 是 乌黑 蜷缩 浊响 清晰 凹陷 硬滑 是 青绿 蜷缩 沉闷 清晰 凹陷 硬滑 是 浅白 蜷缩 浊响 清晰 凹陷 硬滑 是 青绿 稍蜷 浊响 清晰 稍凹 软粘 是 乌黑 稍蜷 浊响 稍糊 稍凹 软粘 是 乌黑 稍蜷 浊响 清晰 稍凹 硬滑 是 乌黑 稍蜷 沉闷 稍糊 稍凹 硬滑 否 青绿 硬挺 清脆 清晰 平坦 软粘 否 浅白 硬挺 清脆 模糊 平坦 硬滑 否 浅白 蜷缩 浊响 模糊 平坦 软粘 否 青绿 蜷缩 浊响 稍糊 凹陷 硬滑 否 浅白 蜷缩 浊响 清晰 稍凹 硬滑 否 乌黑 稍蜷 沉闷 稍糊 稍凹 软粘 否 这个表格展示了每个西瓜样本的属性及其对应的好瓜（是）或坏瓜（否）标签。">
-<meta property='og:url' content='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/'>
+<meta property='og:url' content='https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E5%86%B3%E7%AD%96%E6%A0%91%E6%A8%A1%E5%9E%8B/'>
 <meta property='og:site_name' content='Sion&#39;s blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='DeepLearning' /><meta property='article:published_time' content='2024-08-28T11:37:37&#43;08:00'/><meta property='article:modified_time' content='2024-08-28T11:46:18&#43;08:00'/>
 <meta name="twitter:title" content="【深度学习基础】决策树模型">
@@ -317,11 +317,11 @@
 
                             <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
                                 
-                                    <option value="http://localhost:1313/" selected>中文</option>
+                                    <option value="https://sion258.github.io/" selected>中文</option>
                                 
-                                    <option value="http://localhost:1313/en/" >English</option>
+                                    <option value="https://sion258.github.io/en/" >English</option>
                                 
-                                    <option value="http://localhost:1313/ar/" >عربي</option>
+                                    <option value="https://sion258.github.io/ar/" >عربي</option>
                                 
                             </select>
                         </li>
@@ -1541,6 +1541,19 @@ $ Gini(D)$ 越小，则数据集$D$的纯度越高.</p>
 
         <div class="article-details">
             <h2 class="article-title">【深度学习基础】SVM</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/smo%E7%AE%97%E6%B3%95%E4%BB%A5%E5%9C%A8svm%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8%E4%B8%BA%E4%BE%8B/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">SMO算法（以在SVM中的应用为例）</h2>
         </div>
     </a>
 </article>

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="LDA(线性判别分析) [TOC] 1.LDA是什么 LDA是一种解决二分类问题的线性方法。它描述，对于给定样例集，将样例点投影到一条直线上，这条直线能使异样的样例相距远，同类的样例分布靠近，对于新的样例，根据在这条直线上的投影判断属于哪一类别。 因此我们的所有任务围绕确定直线展开。 2.问题背景 首先描述问题背景，这里直接引用西瓜书原话： 这里描述的是一个二分类问题。 那么如何理解投影？ 3.投影 若已知向量$\\vec{x}$和向量$\\vec{w}$ ,求$\\vec{x}$在向量$\\vec{w}$上的投影，可以用内积表示： $$ \\vec{x} \\cdot \\vec{w} = |\\vec{x}||\\vec{w}|\\cos {\\theta} $$ 当w为单位向量，该投影为： $$ |\\vec{x}|\\cos {\\theta} $$ 因此在下图上，$y$表示target（标签），假设x与y有线性关系由参数集合$w$确定（$y = wx + b，w^T = {w,b}*$） 则任意x在直线上的投影可以认为是x根据线性关系找到的y值，那么这个投影过程表示为： $$ w^TX $$ 其中$x_i$在向量$X$方向上($X={X_1;X_2..;X_i}$) 4.离散度 前面提到需要使得“异样的样例相距远，同类的样例分布靠近”，因此我们需要一个衡量标准，异样的距离使用类间散度衡量，同样使用类内散度衡量 $ \\ {\\mu}_i$用来表示各类的均值，这里只有$\\ {\\mu_0},{\\mu_1}$,分别表示正类和负类的均值。异类之间的距离使用均值在直线的投影的距离表示： $$ ||w^T\\mu_0-w^T\\mu_1||_2^2 = w^T(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^Tw $$ 这里下标2表示2类向量的模，即欧几里得距离 同类之间使用协方差比较距离： $$ w^T(\\Sigma_0 + \\Sigma_1) w $$ $\\ {\\Sigma}$为协方差矩阵 为了简化表示，我们引入两个新概念，类间散度矩阵和类内散度矩阵。 类间散度矩阵用$\\ {S_b}$表示： $$ S_b=(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^T $$ 类内散度矩阵用$S_w$表示： $$ S_w= \\Sigma_0+\\Sigma_1 $$ 5.目标函数 为了同时考虑”使同类样例的投影点尽可能接近，可以让同类样例投影点的协方差尽可">
 <title>【深度学习基础】LDA</title>
 
-<link rel='canonical' href='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80lda/'>
+<link rel='canonical' href='https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80lda/'>
 
 <link rel="stylesheet" href="/scss/style.min.acbdac8b9f8e0d832b2085923d703a03593634d0b84fd45c202d564a4be164b7.css"><meta property='og:title' content="【深度学习基础】LDA">
 <meta property='og:description' content="LDA(线性判别分析) [TOC] 1.LDA是什么 LDA是一种解决二分类问题的线性方法。它描述，对于给定样例集，将样例点投影到一条直线上，这条直线能使异样的样例相距远，同类的样例分布靠近，对于新的样例，根据在这条直线上的投影判断属于哪一类别。 因此我们的所有任务围绕确定直线展开。 2.问题背景 首先描述问题背景，这里直接引用西瓜书原话： 这里描述的是一个二分类问题。 那么如何理解投影？ 3.投影 若已知向量$\\vec{x}$和向量$\\vec{w}$ ,求$\\vec{x}$在向量$\\vec{w}$上的投影，可以用内积表示： $$ \\vec{x} \\cdot \\vec{w} = |\\vec{x}||\\vec{w}|\\cos {\\theta} $$ 当w为单位向量，该投影为： $$ |\\vec{x}|\\cos {\\theta} $$ 因此在下图上，$y$表示target（标签），假设x与y有线性关系由参数集合$w$确定（$y = wx + b，w^T = {w,b}*$） 则任意x在直线上的投影可以认为是x根据线性关系找到的y值，那么这个投影过程表示为： $$ w^TX $$ 其中$x_i$在向量$X$方向上($X={X_1;X_2..;X_i}$) 4.离散度 前面提到需要使得“异样的样例相距远，同类的样例分布靠近”，因此我们需要一个衡量标准，异样的距离使用类间散度衡量，同样使用类内散度衡量 $ \\ {\\mu}_i$用来表示各类的均值，这里只有$\\ {\\mu_0},{\\mu_1}$,分别表示正类和负类的均值。异类之间的距离使用均值在直线的投影的距离表示： $$ ||w^T\\mu_0-w^T\\mu_1||_2^2 = w^T(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^Tw $$ 这里下标2表示2类向量的模，即欧几里得距离 同类之间使用协方差比较距离： $$ w^T(\\Sigma_0 + \\Sigma_1) w $$ $\\ {\\Sigma}$为协方差矩阵 为了简化表示，我们引入两个新概念，类间散度矩阵和类内散度矩阵。 类间散度矩阵用$\\ {S_b}$表示： $$ S_b=(\\mu_0-\\mu_1)(\\mu_0-\\mu_1)^T $$ 类内散度矩阵用$S_w$表示： $$ S_w= \\Sigma_0+\\Sigma_1 $$ 5.目标函数 为了同时考虑”使同类样例的投影点尽可能接近，可以让同类样例投影点的协方差尽可">
-<meta property='og:url' content='http://localhost:1313/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80lda/'>
+<meta property='og:url' content='https://sion258.github.io/p/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80lda/'>
 <meta property='og:site_name' content='Sion&#39;s blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='DeepLearn' /><meta property='article:published_time' content='2024-08-28T21:47:19&#43;08:00'/><meta property='article:modified_time' content='2024-08-28T00:18:28&#43;08:00'/>
 <meta name="twitter:title" content="【深度学习基础】LDA">
@@ -317,11 +317,11 @@
 
                             <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
                                 
-                                    <option value="http://localhost:1313/" selected>中文</option>
+                                    <option value="https://sion258.github.io/" selected>中文</option>
                                 
-                                    <option value="http://localhost:1313/en/" >English</option>
+                                    <option value="https://sion258.github.io/en/" >English</option>
                                 
-                                    <option value="http://localhost:1313/ar/" >عربي</option>
+                                    <option value="https://sion258.github.io/ar/" >عربي</option>
                                 
                             </select>
                         </li>
